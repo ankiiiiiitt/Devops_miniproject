@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Answer | FocusVault</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .result-box {
+            width: 760px;
+            padding: 42px;
+            border-radius: 24px;
+            background: rgba(2, 6, 23, 0.88);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 0 70px rgba(56,189,248,0.28);
+            animation: fadeUp 0.8s ease;
+        }
+
+        .result-box h2 {
+            text-align: center;
+            font-size: 32px;
+            color: #38bdf8;
+            margin-bottom: 8px;
+        }
+
+        .result-box p.sub {
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.75;
+            margin-bottom: 25px;
+        }
+
+        .answer-area {
+            background: #020617;
+            border-radius: 16px;
+            padding: 26px;
+            font-size: 15px;
+            line-height: 1.7;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+            white-space: pre-line;
+            min-height: 160px;
+        }
+
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            width: 200px;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #38bdf8, #6366f1);
+            color: #020617;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.06);
+            box-shadow: 0 0 24px #38bdf8;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #a855f7;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary:hover {
+            color: #38bdf8;
+            border-color: #38bdf8;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* LIGHT MODE SUPPORT */
+        body.light .result-box {
+            background: rgba(255,255,255,0.95);
+            color: #020617;
+        }
+
+        body.light .answer-area {
+            background: #f1f5f9;
+            color: #020617;
+        }
+    </style>
+</head>
+<body>
+
+<div class="result-box">
+
+    <h2>Answer Ready ✨</h2>
+    <p class="sub">Here’s the best possible answer based on your context</p>
+
+    <div class="answer-area">
+        {{ answer }}
+    </div>
+
+    <div class="actions">
+        <a href="/qa">
+            <button class="btn btn-primary">↺ Ask Another</button>
+        </a>
+
+        <a href="/">
+            <button class="btn btn-secondary">🏠 Home</button>
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>

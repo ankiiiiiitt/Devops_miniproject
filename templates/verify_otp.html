@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP | FocusVault</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Verify OTP</h2>
+        <p class="subtitle">Check your email for the 6-digit OTP</p>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <form method="POST">
+            <input type="text" name="otp" placeholder="Enter 6-digit OTP" required maxlength="6" pattern="\d{6}">
+            <button type="submit">Verify</button>
+        </form>
+        
+        <p class="switch">
+            Didn't receive it?
+            <a href="{{ url_for('forgot_password') }}">Try again</a>
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

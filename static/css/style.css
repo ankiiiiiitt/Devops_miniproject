@@ -1,0 +1,310 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #0b1d3a, #020617);
+  color: white;
+}
+
+/* ================= INPUT INTERACTION FIX ================= */
+textarea,
+input,
+button {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 5;
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 70px;
+}
+
+.logo-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-box img {
+  width: 42px;
+  filter: brightness(0) invert(1)
+          sepia(1) saturate(6000%)
+          hue-rotate(180deg);
+}
+
+.logo-box span {
+  font-size: 26px;
+  font-weight: 600;
+  color: #38bdf8;
+}
+
+/* ================= NAV LINKS ================= */
+.nav-links {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.nav-links li a {
+  color: #a855f7;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.nav-links li a:hover {
+  color: #38bdf8;
+}
+
+.welcome-user {
+  color: #38bdf8;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.welcome-user:hover {
+  color: #7dd3fc;
+  text-shadow: 0 0 8px rgba(56,189,248,0.6);
+}
+
+/* ================= LOGOUT ================= */
+.logout-btn {
+  color: #f87171 !important;
+}
+
+.logout-btn:hover {
+  color: #ef4444 !important;
+}
+
+/* ================= HERO ================= */
+.hero {
+  height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 80px;
+}
+
+.hero-text h1 {
+  font-size: 56px;
+  font-weight: 600;
+}
+
+.hero-text p {
+  margin: 20px 0;
+  opacity: 0.85;
+}
+
+/* ================= BUTTONS ================= */
+.btn {
+  padding: 12px 20px;
+  background: #38bdf8;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ================= VIDEO ================= */
+.hero-video video {
+  width: 480px;
+  border-radius: 22px;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  50% { transform: translateY(-12px); }
+}
+
+/* ================= FEATURES ================= */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 30px;
+  padding: 70px 80px;
+}
+
+.card {
+  background: #020617;
+  padding: 35px;
+  border-radius: 18px;
+  text-decoration: none;
+  color: white;
+  text-align: center;
+  transition: 0.4s;
+}
+
+.card:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 0 30px rgba(56,189,248,0.7);
+}
+
+/* ================= FOOTER ================= */
+footer {
+  text-align: center;
+  padding: 22px;
+  opacity: 0.5;
+}
+
+/* ================= THEME BUTTON ================= */
+.theme-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #38bdf8;
+  transition: transform 0.3s ease;
+}
+
+.theme-btn:hover {
+  transform: scale(1.2);
+}
+
+/* ================= LIGHT MODE ================= */
+body.light {
+  background: linear-gradient(to bottom, #f8fafc, #e5e7eb);
+  color: #020617;
+}
+
+body.light .logo-box span {
+  color: #2563eb;
+}
+
+body.light .nav-links li a {
+  color: #6d28d9;
+}
+
+body.light .nav-links li a:hover {
+  color: #2563eb;
+}
+
+body.light .welcome-user {
+  color: #2563eb;
+}
+
+body.light .card {
+  background: #ffffff;
+  color: #020617;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+}
+
+body.light footer {
+  color: #020617;
+}
+
+/* ================= BACKGROUND GLOWS ================= */
+.bg-glow {
+  position: fixed;
+  width: 420px;
+  height: 420px;
+  filter: blur(140px);
+  opacity: 0.45;
+  z-index: -1;
+}
+
+.bg-glow.blue {
+  background: #38bdf8;
+  top: -120px;
+  left: -120px;
+}
+
+.bg-glow.purple {
+  background: #a855f7;
+  bottom: -120px;
+  right: -120px;
+}
+
+/* ================= GRADIENT TEXT ================= */
+.gradient-text {
+  background: linear-gradient(90deg, #38bdf8, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ================= HERO ACTIONS ================= */
+.hero-actions {
+  display: flex;
+  gap: 18px;
+  margin-top: 25px;
+}
+
+/* ================= OUTLINE BUTTON ================= */
+.btn-outline {
+  padding: 12px 26px;
+  border-radius: 8px;
+  border: 1px solid #38bdf8;
+  color: #38bdf8;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn-outline:hover {
+  background: #38bdf8;
+  color: black;
+}
+
+/* ================= STATS ================= */
+.stats {
+  display: flex;
+  gap: 35px;
+  margin-top: 35px;
+}
+
+.stats h3 {
+  font-size: 22px;
+  color: #38bdf8;
+}
+
+.stats span {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* ================= GLASS ================= */
+.glass {
+  background: rgba(2,6,23,0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ================= CTA ================= */
+.cta {
+  text-align: center;
+  padding: 90px 20px;
+}
+
+.cta h2 {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.cta p {
+  opacity: 0.75;
+  margin-bottom: 30px;
+}
+
+.btn.big {
+  padding: 16px 36px;
+  font-size: 16px;
+}
+
+/* ================= QA BOX SAFETY ================= */
+.qa-box {
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
+}
