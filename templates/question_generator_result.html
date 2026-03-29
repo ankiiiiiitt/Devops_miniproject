@@ -47,22 +47,33 @@
         }
 
         li {
-            background: #020617;
-            padding: 18px 20px;
-            margin-bottom: 14px;
-            border-radius: 14px;
+            background: rgba(2, 6, 23, 0.5);
+            padding: 22px 24px;
+            margin-bottom: 18px;
+            border-radius: 16px;
             font-size: 15px;
             line-height: 1.6;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             position: relative;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        li:hover {
+            transform: translateY(-4px) scale(1.01);
+            border-color: rgba(56, 189, 248, 0.6);
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.2);
+            background: rgba(2, 6, 23, 0.8);
         }
 
         li::before {
-            content: "❓";
+            content: "✨";
             position: absolute;
-            left: -38px;
-            top: 18px;
+            left: -35px;
+            top: 22px;
             font-size: 18px;
+            filter: drop-shadow(0 0 5px #38bdf8);
         }
 
         .actions {
