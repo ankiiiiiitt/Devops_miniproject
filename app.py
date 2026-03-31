@@ -172,8 +172,12 @@ def verify_otp():
             
         # Check expiry
         now = datetime.datetime.now(datetime.timezone.utc)
-        if user.get("otp_expiry") and user.get("otp_expiry") < now:
-            return render_template("verify_otp.html", error="OTP has expired.")
+        otp_expiry = user.get("otp_expiry")
+        if otp_expiry:
+            if otp_expiry.tzinfo is None:
+                otp_expiry = otp_expiry.replace(tzinfo=datetime.timezone.utc)
+            if otp_expiry < now:
+                return render_template("verify_otp.html", error="OTP has expired.")
             
         if user.get("otp") == otp_entered:
             session['otp_verified'] = True
