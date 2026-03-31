@@ -176,8 +176,12 @@ footer {
 
 /* ================= LIGHT MODE ================= */
 body.light {
-  background: linear-gradient(to bottom, #f8fafc, #e5e7eb);
-  color: #020617;
+  background: #f8fafc !important;
+  color: #0f172a;
+}
+
+body.light .bg-glow {
+  display: none !important;
 }
 
 body.light .logo-box span {
@@ -266,7 +270,7 @@ body.light .chat-history-list a.active {
 body.light .chat-message.ai {
   background: #ffffff;
   color: #0f172a;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.05);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
@@ -288,10 +292,30 @@ body.light .chat-message.user {
 /* Generic Tool Boxes Light Overrides */
 body.light .result-container,
 body.light .form-box,
-body.light .qa-box {
-    background: rgba(255,255,255,0.95);
+body.light .qa-box,
+body.light .study-plan-box,
+body.light .summarizer-box {
+    background: #ffffff;
     color: #020617;
     box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+body.light textarea,
+body.light input[type="file"],
+body.light input[type="text"],
+body.light input[type="number"],
+body.light select {
+    background: #f8fafc;
+    color: #0f172a;
+    border: 1px solid rgba(0,0,0,0.15);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+body.light .chat-input-box textarea {
+    background: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 /* ================= BACKGROUND GLOWS ================= */
