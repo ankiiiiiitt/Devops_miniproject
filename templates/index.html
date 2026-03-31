@@ -25,6 +25,7 @@
 
         {% if user %}
             <li class="user-name">Hi, {{ user }}</li>
+            <li><a href="{{ url_for('chat') }}" style="color: #38bdf8; font-weight: 500;">Go to Dashboard 🚀</a></li>
             <li><a href="{{ url_for('logout') }}" class="logout-btn">Logout</a></li>
         {% else %}
             <li><a href="{{ url_for('login') }}">Login</a></li>

@@ -17,7 +17,7 @@
 
 <div class="dashboard-layout">
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <a href="{{ url_for('home') }}" class="sidebar-logo">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="FocusVault Logo">
             <span>FocusVault</span>
@@ -57,7 +57,14 @@
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="main-content">
+    <main class="main-content" id="main-content">
+        <button class="sidebar-toggle-btn" id="sidebarToggle" title="Toggle Sidebar">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
         {% block content %}{% endblock %}
     </main>
 </div>
@@ -101,6 +108,18 @@
     }
     
     document.addEventListener("DOMContentLoaded", loadChatHistory);
+
+    // Sidebar Toggle Logic
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
+
+    if (toggleBtn && sidebar && mainContent) {
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+    }
 </script>
 </body>
 </html>

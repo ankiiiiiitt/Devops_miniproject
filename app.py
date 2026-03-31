@@ -61,8 +61,6 @@ def ask_ai(prompt):
 @app.route("/")
 def home():
     user = session.get("user")
-    if user:
-        return redirect(url_for("chat"))
     return render_template("index.html", user=user)
 
 # ================= CHAT =================
