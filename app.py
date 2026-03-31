@@ -1,6 +1,7 @@
 import os
 import datetime
 import random
+import PyPDF2
 from flask import Flask, render_template, request, session, redirect, url_for, flash
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -318,6 +319,65 @@ Day-wise plan with topics and revision.
         return render_template("study_plan_result.html", plan=plan)
 
     return render_template("study_plan.html")
+
+
+# ================= UPLOAD NOTES =================
+@app.route("/upload-notes", methods=["GET", "POST"])
+def upload_notes():
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        if "pdf_file" not in request.files:
+            return render_template("upload_notes.html", error="No file part uploaded.")
+
+        file = request.files["pdf_file"]
+        if file.filename == '':
+            return render_template("upload_notes.html", error="No selected file.")
+
+        if not file.filename.lower().endswith('.pdf'):
+            return render_template("upload_notes.html", error="Only PDF files are allowed.")
+
+        # Read and check file size (5MB limit)
+        file_data = file.read()
+        if len(file_data) > 5 * 1024 * 1024:
+            return render_template("upload_notes.html", error="File size exceeds the 5MB limit.")
+
+        try:
+            from io import BytesIO
+            pdf = PyPDF2.PdfReader(BytesIO(file_data))
+            text = ""
+            for page in pdf.pages:
+                extracted = page.extract_text()
+                if extracted:
+                    text += extracted + "\n"
+
+            if not text.strip():
+                return render_template("upload_notes.html", error="Could not extract any text from the PDF.")
+
+            # Limit text size to ~20000 characters to prevent API token limits
+            text_to_process = text[:20000]
+
+            summary = ask_ai(
+                f"Summarize the following text into clear exam-ready bullet points:\n{text_to_process}"
+            )
+
+            questions_text = ask_ai(
+                f"Generate 5 exam questions in numbered format based on the following text:\n{text_to_process}"
+            )
+            questions_list = [q.strip() for q in questions_text.split("\n") if q.strip()]
+
+            return render_template(
+                "upload_result.html",
+                summary=summary,
+                questions=questions_list
+            )
+
+        except Exception as e:
+            print("PDF Extraction Error:", e)
+            return render_template("upload_notes.html", error="An error occurred processing the PDF file.")
+
+    return render_template("upload_notes.html")
 
 
 # ================= RUN =================
