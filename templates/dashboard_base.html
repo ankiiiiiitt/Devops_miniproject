@@ -23,6 +23,11 @@
             <span>FocusVault</span>
         </a>
 
+        <a href="{{ url_for('chat') }}" class="new-chat-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            New Chat
+        </a>
+
         <ul class="sidebar-nav">
             <li><a href="{{ url_for('chat') }}">💬 General Chat</a></li>
             <li><a href="{{ url_for('summarizer') }}">📝 Smart Summarizer</a></li>
@@ -30,6 +35,13 @@
             <li><a href="{{ url_for('upload_notes') }}">📄 Upload PDF Notes</a></li>
             <li><a href="{{ url_for('study_plan') }}">📅 Study Planner</a></li>
             <li><a href="{{ url_for('qa') }}">🔍 Document Q&A</a></li>
+            
+            <li><div class="sidebar-section-title">Recent Chats</div></li>
+            <li>
+                <ul class="chat-history-list" id="sidebar-chat-history">
+                    <span style="font-size: 13px; color: #64748b; padding-left: 15px;">Loading...</span>
+                </ul>
+            </li>
         </ul>
 
         <div class="sidebar-footer">
@@ -51,5 +63,44 @@
 </div>
 
 {% block scripts %}{% endblock %}
+<script>
+    // Fetch and populate Recent Chats in sidebar
+    async function loadChatHistory() {
+        try {
+            const response = await fetch('/api/chats');
+            const data = await response.json();
+            
+            if(data.chats) {
+                const listElem = document.getElementById('sidebar-chat-history');
+                listElem.innerHTML = '';
+                
+                const currentPath = window.location.pathname;
+
+                if(data.chats.length === 0) {
+                    listElem.innerHTML = '<span style="font-size: 13px; color: #64748b; padding-left: 15px;">No previous chats</span>';
+                }
+
+                data.chats.forEach(chat => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = `/chat/${chat.id}`;
+                    a.textContent = chat.title;
+                    a.title = chat.title;
+                    
+                    if(currentPath === `/chat/${chat.id}`) {
+                        a.className = 'active';
+                    }
+                    
+                    li.appendChild(a);
+                    listElem.appendChild(li);
+                });
+            }
+        } catch (err) {
+            console.error('Failed to load chat history:', err);
+        }
+    }
+    
+    document.addEventListener("DOMContentLoaded", loadChatHistory);
+</script>
 </body>
 </html>

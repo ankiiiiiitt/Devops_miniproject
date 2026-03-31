@@ -3,9 +3,19 @@
 {% block content %}
 <div class="chat-container">
     <div class="chat-history" id="chatHistory">
+        {% if messages %}
+            {% for msg in messages %}
+                {% if msg.role != 'system' %}
+                <div class="chat-message {{ 'user' if msg.role == 'user' else 'ai' }}">
+                    {{ msg.content }}
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
         <div class="chat-message ai">
             Hello {{ session.get('user', 'there') }}! I'm your AI study assistant. How can I help you focus and learn today?
         </div>
+        {% endif %}
     </div>
 
     <div class="chat-input-wrapper">
@@ -29,10 +39,7 @@
     const chatInput = document.getElementById('chatInput');
     const sendBtn = document.getElementById('sendBtn');
     
-    // Memory arrays for API context
-    const conversation = [
-        { role: "system", content: "You are FocusVault, an incredibly smart, encouraging, and helpful AI study assistant." }
-    ];
+    let currentChatId = "{{ chat_id if chat_id else '' }}";
 
     chatInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -45,35 +52,45 @@
         const text = chatInput.value.trim();
         if (!text) return;
 
-        // Reset input
         chatInput.value = '';
         chatInput.style.height = 'auto';
 
-        // Add user message to UI
         appendMessage(text, 'user');
-        conversation.push({ role: 'user', content: text });
 
-        // Add loading state
         const loadingId = 'loading-' + Date.now();
         appendMessage('...', 'ai', loadingId);
 
         try {
+            const payload = { message: text };
+            if (currentChatId) {
+                payload.chat_id = currentChatId;
+            }
+
             const response = await fetch('/chat_api', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages: conversation })
+                body: JSON.stringify(payload)
             });
 
             const data = await response.json();
             
-            // Remove loading
             document.getElementById(loadingId).remove();
 
             if (data.error) {
                 appendMessage('Sorry, an error occurred: ' + data.error, 'ai');
             } else {
                 appendMessage(data.reply, 'ai');
-                conversation.push({ role: 'assistant', content: data.reply });
+                
+                // If this is a new chat, update URL and state without reloading
+                if (!currentChatId && data.chat_id) {
+                    currentChatId = data.chat_id;
+                    window.history.pushState({}, '', '/chat/' + currentChatId);
+                    
+                    // Trigger sidebar reload
+                    if(typeof loadChatHistory === 'function') {
+                        loadChatHistory();
+                    }
+                }
             }
 
         } catch (err) {
@@ -81,6 +98,11 @@
             appendMessage('Failed to connect to AI server.', 'ai');
         }
     }
+
+    // Scroll to bottom immediately on load
+    window.addEventListener('DOMContentLoaded', () => {
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    });
 
     function appendMessage(text, sender, id = null) {
         const div = document.createElement('div');

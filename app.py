@@ -23,6 +23,7 @@ db = mongo_client.get_default_database() if mongo_client.get_default_database().
 
 users_col = db.users
 cache_col = db.cache
+chats_col = db.chats
 
 # ================= MAIL SETUP =================
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
@@ -66,10 +67,40 @@ def home():
 
 # ================= CHAT =================
 @app.route("/chat")
-def chat():
+@app.route("/chat/<chat_id>")
+def chat(chat_id=None):
     if "user" not in session:
         return redirect(url_for("login"))
-    return render_template("chat.html")
+    
+    messages = []
+    if chat_id:
+        from bson.objectid import ObjectId
+        from bson.errors import InvalidId
+        try:
+            current_chat = chats_col.find_one({"_id": ObjectId(chat_id), "user_email": session.get("user_email")})
+            if current_chat:
+                messages = current_chat.get("messages", [])
+        except InvalidId:
+            pass
+            
+    return render_template("chat.html", chat_id=chat_id, messages=messages)
+
+@app.route("/api/chats")
+def list_chats():
+    if "user" not in session:
+        return {"error": "Unauthorized"}, 401
+    
+    user_email = session.get("user_email")
+    chats = list(chats_col.find({"user_email": user_email}).sort("updated_at", -1).limit(50))
+    
+    chat_list = []
+    for c in chats:
+        chat_list.append({
+            "id": str(c["_id"]),
+            "title": c.get("title", "New Chat")
+        })
+        
+    return {"chats": chat_list}
 
 @app.route("/chat_api", methods=["POST"])
 def chat_api():
@@ -77,15 +108,58 @@ def chat_api():
         return {"error": "Unauthorized"}, 401
 
     data = request.json
-    messages = data.get("messages", [])
+    chat_id = data.get("chat_id")
+    user_message = data.get("message")
+    user_email = session.get("user_email")
+    
+    if not user_message:
+        return {"error": "Message is required"}, 400
 
+    from bson.objectid import ObjectId
+    import datetime
+
+    chat_doc = None
+    if chat_id:
+        try:
+            chat_doc = chats_col.find_one({"_id": ObjectId(chat_id), "user_email": user_email})
+        except:
+            chat_doc = None
+
+    if not chat_doc:
+        system_msg = {"role": "system", "content": "You are FocusVault, an incredibly smart, encouraging, and helpful AI study assistant."}
+        chat_doc = {
+            "user_email": user_email,
+            "title": user_message[:30] + "..." if len(user_message) > 30 else user_message,
+            "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "messages": [system_msg]
+        }
+        res = chats_col.insert_one(chat_doc)
+        chat_id = str(res.inserted_id)
+        chat_doc["_id"] = res.inserted_id
+
+    new_user_msg = {"role": "user", "content": user_message}
+    chat_doc["messages"].append(new_user_msg)
+    
     try:
         response = client.chat.completions.create(
-            messages=messages,
+            messages=chat_doc["messages"],
             model="llama-3.3-70b-versatile"
         )
         reply = response.choices[0].message.content.strip()
-        return {"reply": reply}
+        
+        new_ai_msg = {"role": "assistant", "content": reply}
+        chat_doc["messages"].append(new_ai_msg)
+        
+        chats_col.update_one(
+            {"_id": ObjectId(chat_id)},
+            {"$set": {
+                "messages": chat_doc["messages"],
+                "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+            }}
+        )
+        
+        return {"reply": reply, "chat_id": chat_id}
 
     except Exception as e:
         print("GROQ CHAT ERROR:", e)
