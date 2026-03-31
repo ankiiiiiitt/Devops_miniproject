@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script>
-        function applySystemTheme() {
-            if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        function applyTheme(theme) {
+            if (theme === 'light') {
                 document.documentElement.classList.add('light');
                 document.body.classList.add('light');
             } else {
@@ -16,8 +16,37 @@
                 document.body.classList.remove('light');
             }
         }
-        applySystemTheme();
-        window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', applySystemTheme);
+
+        function initTheme() {
+            const storedTheme = localStorage.getItem('theme');
+            if (storedTheme) {
+                applyTheme(storedTheme);
+            } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+                applyTheme('light');
+            } else {
+                applyTheme('dark');
+            }
+        }
+
+        initTheme();
+
+        window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                applyTheme(e.matches ? 'light' : 'dark');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleBtns = document.querySelectorAll('.theme-btn');
+            toggleBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const currentTheme = document.body.classList.contains('light') ? 'light' : 'dark';
+                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                    localStorage.setItem('theme', newTheme);
+                    applyTheme(newTheme);
+                });
+            });
+        });
     </script>
 </head>
 <body>
@@ -34,6 +63,7 @@
     </div>
 
     <ul class="nav-links">
+        <li><button class="theme-btn" title="Toggle Theme">🌓</button></li>
         <li><a href="{{ url_for('home') }}">Home</a></li>
 
         {% if user %}
