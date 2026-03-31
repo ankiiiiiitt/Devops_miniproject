@@ -206,6 +206,94 @@ body.light footer {
   color: #020617;
 }
 
+/* Dashboard Light Overrides */
+body.light .sidebar {
+  background: rgba(255, 255, 255, 0.95);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light .sidebar-logo span {
+  color: #2563eb;
+}
+
+body.light .sidebar-nav a {
+  color: #475569;
+}
+
+body.light .sidebar-nav a:hover, body.light .sidebar-nav a.active {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+body.light .sidebar-toggle-btn {
+  color: #475569;
+}
+
+body.light .sidebar-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #020617;
+}
+
+body.light .user-profile-name {
+  color: #0f172a;
+}
+
+body.light .new-chat-btn {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.2);
+  color: #2563eb;
+}
+
+body.light .new-chat-btn:hover {
+  background: #2563eb;
+  color: white;
+}
+
+body.light .chat-history-list a {
+  color: #475569;
+}
+
+body.light .chat-history-list a:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #020617;
+}
+
+body.light .chat-history-list a.active {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+body.light .chat-message.ai {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+body.light .chat-input-box {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+body.light .chat-input-box textarea {
+  color: #0f172a;
+}
+
+body.light .chat-message.user {
+  background: #2563eb;
+  color: white;
+}
+
+/* Generic Tool Boxes Light Overrides */
+body.light .result-container,
+body.light .form-box,
+body.light .qa-box {
+    background: rgba(255,255,255,0.95);
+    color: #020617;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+}
+
 /* ================= BACKGROUND GLOWS ================= */
 .bg-glow {
   position: fixed;
