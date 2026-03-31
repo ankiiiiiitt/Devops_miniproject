@@ -24,6 +24,7 @@ db = mongo_client.get_default_database() if mongo_client.get_default_database().
 users_col = db.users
 cache_col = db.cache
 chats_col = db.chats
+notes_col = db.notes
 
 # ================= MAIL SETUP =================
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
@@ -63,6 +64,40 @@ def home():
     user = session.get("user")
     return render_template("index.html", user=user)
 
+# ================= NOTES =================
+@app.route("/notes", methods=["GET", "POST"])
+def notes():
+    if "user" not in session:
+        return redirect(url_for("login"))
+    
+    if request.method == "POST":
+        title = request.form.get("title")
+        content = request.form.get("content")
+        if title and content:
+            import datetime
+            notes_col.insert_one({
+                "user_email": session.get("user_email"),
+                "title": title,
+                "content": content,
+                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+            })
+        return redirect(url_for("notes"))
+        
+    user_notes = list(notes_col.find({"user_email": session.get("user_email")}).sort("created_at", -1))
+    return render_template("notes.html", notes=user_notes)
+
+@app.route("/notes/delete/<note_id>", methods=["POST"])
+def delete_note(note_id):
+    if "user" not in session:
+        return redirect(url_for("login"))
+        
+    from bson.objectid import ObjectId
+    try:
+        notes_col.delete_one({"_id": ObjectId(note_id), "user_email": session.get("user_email")})
+    except:
+        pass
+    return redirect(url_for("notes"))
+
 # ================= CHAT =================
 @app.route("/chat")
 @app.route("/chat/<chat_id>")
@@ -97,8 +132,19 @@ def list_chats():
             "id": str(c["_id"]),
             "title": c.get("title", "New Chat")
         })
-        
     return {"chats": chat_list}
+
+@app.route("/api/chats/delete/<chat_id>", methods=["POST"])
+def delete_chat(chat_id):
+    if "user" not in session:
+        return redirect(url_for("login"))
+        
+    from bson.objectid import ObjectId
+    try:
+        chats_col.delete_one({"_id": ObjectId(chat_id), "user_email": session.get("user_email")})
+    except:
+        pass
+    return redirect(url_for("chat"))
 
 @app.route("/chat_api", methods=["POST"])
 def chat_api():

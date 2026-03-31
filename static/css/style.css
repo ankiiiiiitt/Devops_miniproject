@@ -588,3 +588,123 @@ footer {
   background: rgba(56, 189, 248, 0.15);
   color: #38bdf8;
 }
+
+/* ================= NOTES MODULE ================= */
+.notes-container {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 0 20px;
+}
+
+.note-form-box {
+  padding: 30px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.note-input-title {
+  width: 100%;
+  background: rgba(2, 6, 23, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  font-size: 18px;
+  margin-bottom: 15px;
+  font-family: 'Poppins', sans-serif;
+  outline: none;
+  transition: 0.2s;
+}
+
+.note-input-title:focus, .note-input-content:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+}
+
+.note-input-content {
+  width: 100%;
+  background: rgba(2, 6, 23, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: 'Poppins', sans-serif;
+  resize: vertical;
+  outline: none;
+  transition: 0.2s;
+  min-height: 120px;
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.note-card {
+  padding: 20px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  transition: 0.3s;
+}
+
+.note-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(56, 189, 248, 0.3);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.note-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.note-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #38bdf8;
+  margin: 0;
+  word-break: break-word;
+}
+
+.btn-delete {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 6px;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.note-content {
+  font-size: 14px;
+  color: #cbd5e1;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  flex: 1;
+  margin-bottom: 15px;
+  word-break: break-word;
+}
+
+.note-date {
+  font-size: 12px;
+  color: #64748b;
+  text-align: right;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 10px;
+}

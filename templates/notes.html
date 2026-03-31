@@ -1,0 +1,50 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+<div class="tool-container-flex">
+    <div class="notes-container">
+        <!-- New Note Form -->
+        <div class="note-form-box glass">
+            <h2 style="margin-bottom: 20px; font-weight: 500; font-size: 24px; color: #38bdf8;">Write a Note ✏️</h2>
+            <form action="{{ url_for('notes') }}" method="POST">
+                <input type="text" name="title" placeholder="Note Title..." class="note-input-title" required>
+                <textarea name="content" placeholder="Start typing your note here..." class="note-input-content" rows="4" required></textarea>
+                <div style="text-align: right; margin-top: 15px;">
+                    <button type="submit" class="btn btn-primary" style="padding: 12px 25px; font-weight: 500; background: #38bdf8; color: #020617; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s;">Save Note</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Saved Notes Grid -->
+        {% if notes %}
+        <div class="notes-grid">
+            {% for note in notes %}
+            <div class="note-card glass">
+                <div class="note-card-header">
+                    <h3 class="note-title">{{ note.title }}</h3>
+                    <form action="{{ url_for('delete_note', note_id=note._id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this note?');">
+                        <button type="submit" class="btn-delete" title="Delete Note">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+                <div class="note-content">
+                    {{ note.content }}
+                </div>
+                <div class="note-date">
+                    {{ note.created_at[:10] }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-notes-message glass" style="padding: 30px; border-radius: 12px; margin-top: 30px; text-align: center;">
+            <p style="color: #94a3b8; margin: 0;">You haven't saved any notes yet. Write your first note above!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
