@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FocusVault Dashboard</title>
+    <title>FocusVault Workspace</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -116,8 +116,8 @@
 
     if (toggleBtn && sidebar && mainContent) {
         toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
+            sidebar.classList.toggle('active');
+            mainContent.classList.toggle('shifted');
         });
     }
 </script>
