@@ -1,0 +1,99 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-history" id="chatHistory">
+        <div class="chat-message ai">
+            Hello {{ session.get('user', 'there') }}! I'm your AI study assistant. How can I help you focus and learn today?
+        </div>
+    </div>
+
+    <div class="chat-input-wrapper">
+        <div class="chat-input-box">
+            <textarea id="chatInput" placeholder="Ask anything..." rows="1" 
+                oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+            <button id="sendBtn" onclick="sendMessage()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const chatHistory = document.getElementById('chatHistory');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    
+    // Memory arrays for API context
+    const conversation = [
+        { role: "system", content: "You are FocusVault, an incredibly smart, encouraging, and helpful AI study assistant." }
+    ];
+
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    async function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        // Reset input
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+
+        // Add user message to UI
+        appendMessage(text, 'user');
+        conversation.push({ role: 'user', content: text });
+
+        // Add loading state
+        const loadingId = 'loading-' + Date.now();
+        appendMessage('...', 'ai', loadingId);
+
+        try {
+            const response = await fetch('/chat_api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: conversation })
+            });
+
+            const data = await response.json();
+            
+            // Remove loading
+            document.getElementById(loadingId).remove();
+
+            if (data.error) {
+                appendMessage('Sorry, an error occurred: ' + data.error, 'ai');
+            } else {
+                appendMessage(data.reply, 'ai');
+                conversation.push({ role: 'assistant', content: data.reply });
+            }
+
+        } catch (err) {
+            document.getElementById(loadingId).remove();
+            appendMessage('Failed to connect to AI server.', 'ai');
+        }
+    }
+
+    function appendMessage(text, sender, id = null) {
+        const div = document.createElement('div');
+        div.className = `chat-message ${sender}`;
+        if (id) div.id = id;
+        div.textContent = text;
+        chatHistory.appendChild(div);
+        
+        // Scroll to bottom
+        chatHistory.scrollTo({
+            top: chatHistory.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+</script>
+{% endblock %}

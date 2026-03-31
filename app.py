@@ -60,7 +60,36 @@ def ask_ai(prompt):
 @app.route("/")
 def home():
     user = session.get("user")
+    if user:
+        return redirect(url_for("chat"))
     return render_template("index.html", user=user)
+
+# ================= CHAT =================
+@app.route("/chat")
+def chat():
+    if "user" not in session:
+        return redirect(url_for("login"))
+    return render_template("chat.html")
+
+@app.route("/chat_api", methods=["POST"])
+def chat_api():
+    if "user" not in session:
+        return {"error": "Unauthorized"}, 401
+
+    data = request.json
+    messages = data.get("messages", [])
+
+    try:
+        response = client.chat.completions.create(
+            messages=messages,
+            model="llama-3.3-70b-versatile"
+        )
+        reply = response.choices[0].message.content.strip()
+        return {"reply": reply}
+
+    except Exception as e:
+        print("GROQ CHAT ERROR:", e)
+        return {"error": "AI service temporarily unavailable."}, 500
 
 # ================= LOGIN =================
 @app.route("/login", methods=["GET", "POST"])
@@ -74,7 +103,7 @@ def login():
         if user and check_password_hash(user.get("password", ""), password):
             session["user"] = user.get("name")
             session["user_email"] = user.get("email")
-            return redirect(url_for("home"))
+            return redirect(url_for("chat"))
         else:
             return render_template("login.html", error="Invalid email or password")
 

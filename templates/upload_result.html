@@ -1,14 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notes Results | FocusVault</title>
+{% extends "dashboard_base.html" %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-    <style>
+{% block styles %}
+<style>
         body { padding: 40px; }
 
         .result-container {
@@ -75,8 +68,10 @@
             to { opacity: 1; transform: scale(1); }
         }
     </style>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
+<div class="tool-container-flex">
 
 <div class="result-container">
     <h1>Document Insights ✨</h1>
@@ -94,5 +89,5 @@
     <a href="/" class="btn-home">🏠 Return Home</a>
 </div>
 
-</body>
-</html>
+</div>
+{% endblock %}

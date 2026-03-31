@@ -1,13 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Summary Result | FocusVault</title>
+{% extends "dashboard_base.html" %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-    <style>
+{% block styles %}
+<style>
         body {
             min-height: 100vh;
             display: flex;
@@ -120,8 +114,10 @@
             color: #020617;
         }
     </style>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
+<div class="tool-container-flex">
 
 <div class="result-box">
 
@@ -144,5 +140,5 @@
 
 </div>
 
-</body>
-</html>
+</div>
+{% endblock %}

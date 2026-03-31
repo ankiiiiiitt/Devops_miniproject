@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusVault Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    {% block styles %}{% endblock %}
+</head>
+<body>
+
+<!-- BACKGROUND BLUR -->
+<div class="bg-glow blue"></div>
+<div class="bg-glow purple"></div>
+
+<div class="dashboard-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <a href="{{ url_for('home') }}" class="sidebar-logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="FocusVault Logo">
+            <span>FocusVault</span>
+        </a>
+
+        <ul class="sidebar-nav">
+            <li><a href="{{ url_for('chat') }}">💬 General Chat</a></li>
+            <li><a href="{{ url_for('summarizer') }}">📝 Smart Summarizer</a></li>
+            <li><a href="{{ url_for('question_generator') }}">✨ AI Question Gen</a></li>
+            <li><a href="{{ url_for('upload_notes') }}">📄 Upload PDF Notes</a></li>
+            <li><a href="{{ url_for('study_plan') }}">📅 Study Planner</a></li>
+            <li><a href="{{ url_for('qa') }}">🔍 Document Q&A</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                {% if session.get('user') %}
+                    <span class="user-profile-name">hi, {{ session.get('user') }}</span>
+                    <a href="{{ url_for('logout') }}" class="logout-btn" style="text-decoration: none; font-size: 13px;">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" style="color: #38bdf8; text-decoration: none;">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>
