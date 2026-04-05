@@ -59,16 +59,15 @@
     }
 
     .subject-card {
-        background: rgba(15, 23, 42, 0.3);
-        backdrop-filter: blur(40px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #0f172a; /* Solid Slate for better contrast */
+        border: 2px solid rgba(255, 255, 255, 0.05); /* Sharper border */
         border-radius: 32px;
         padding: 35px;
         position: relative;
         overflow: hidden;
         transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         transform-style: preserve-3d;
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
     }
 
     .subject-card:hover {
@@ -105,17 +104,17 @@
         display: flex;
         align-items: center;
         gap: 15px;
-        background: rgba(255, 255, 255, 0.03);
+        background: rgba(255, 255, 255, 0.02); /* Very subtle solid background */
         padding: 14px 20px;
         border-radius: 16px;
         transition: 0.3s;
-        border: 1px solid transparent;
+        border: 1px solid rgba(255, 255, 255, 0.03);
         cursor: pointer;
         position: relative;
         z-index: 10;
         pointer-events: auto;
         user-select: none;
-        transform: translateZ(10px); /* Force in front of card surface */
+        transform: translateZ(10px);
     }
 
     .topic-item:hover {
@@ -206,8 +205,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(2, 6, 23, 0.85);
-        backdrop-filter: blur(25px);
+        background: rgba(2, 6, 23, 0.95); /* Solid dark mask */
         display: none;
         align-items: center;
         justify-content: center;
@@ -218,13 +216,12 @@
     .modal-overlay.active { display: flex; }
 
     .modal.card {
-        background: rgba(15, 23, 42, 0.7);
-        backdrop-filter: blur(50px);
-        border: 1px solid rgba(56, 189, 248, 0.2);
+        background: #111827; /* Deep Slate Solid */
+        border: 2px solid rgba(56, 189, 248, 0.4);
         width: 500px;
         padding: 45px;
         border-radius: 35px;
-        box-shadow: 0 50px 100px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 50px 100px rgba(0, 0, 0, 0.8);
         transform: perspective(1000px) rotateX(10deg);
         animation: modalEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -241,6 +238,7 @@
         font-weight: 700;
         background: linear-gradient(135deg, #38bdf8, #818cf8);
         -webkit-background-clip: text;
+        background-clip: text; /* Fixed compatibility warning */
         -webkit-text-fill-color: transparent;
     }
 
