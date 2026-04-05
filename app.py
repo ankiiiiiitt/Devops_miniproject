@@ -144,6 +144,28 @@ def delete_bookmark(bookmark_id):
         pass
     return redirect(url_for("bookmarks"))
 
+@app.route("/bookmarks/update/<bookmark_id>", methods=["POST"])
+def update_bookmark(bookmark_id):
+    if "user" not in session:
+        return {"error": "Unauthorized"}, 401
+        
+    data = request.json
+    title = data.get("title")
+    content = data.get("content")
+    
+    if not content:
+        return {"error": "Content is required"}, 400
+        
+    from bson.objectid import ObjectId
+    try:
+        bookmarks_col.update_one(
+            {"_id": ObjectId(bookmark_id), "user_email": session.get("user_email")},
+            {"$set": {"title": title, "content": content}}
+        )
+        return {"status": "success", "message": "Bookmark updated!"}
+    except:
+        return {"error": "Failed to update bookmark"}, 500
+
 # ================= CHAT =================
 @app.route("/chat")
 @app.route("/chat/<chat_id>")
