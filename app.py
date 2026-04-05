@@ -28,6 +28,7 @@ cache_col = db.cache
 chats_col = db.chats
 notes_col = db.notes
 bookmarks_col = db.bookmarks
+study_progress_col = db.study_progress
 
 # ================= MAIL SETUP =================
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
@@ -655,6 +656,136 @@ Day-wise plan with topics and revision.
 
     return render_template("study_plan.html")
 
+
+# ================= STUDY PROGRESS =================
+@app.route("/study-progress")
+def study_progress():
+    if "user" not in session:
+        return redirect(url_for("login"))
+    return render_template("study_progress.html")
+
+@app.route("/api/study-progress")
+def get_study_progress_api():
+    if "user" not in session:
+        return {"error": "Unauthorized"}, 401
+    
+    user_email = session.get("user_email")
+    subjects = list(study_progress_col.find({"user_email": user_email}))
+    
+    # Process for JSON serialization
+    for s in subjects:
+        s["_id"] = str(s["_id"])
+    
+    # Calculate overall stats
+    total_completed = sum(s.get("completed_topics", 0) for s in subjects)
+    total_topics = sum(s.get("total_topics", 0) for s in subjects)
+    overall_percentage = (total_completed / total_topics * 100) if total_topics > 0 else 0
+    
+    # Dummy streak logic (can be refined with logic checking last study date)
+    user = users_col.find_one({"email": user_email})
+    streak = user.get("study_streak", 0) if user else 0
+    
+    return {
+        "subjects": subjects,
+        "stats": {
+            "total_subjects": len(subjects),
+            "overall_percentage": round(overall_percentage, 1),
+            "streak": streak
+        }
+    }
+
+@app.route("/api/study-progress/add", methods=["POST"])
+def add_subject_api():
+    if "user" not in session:
+        return {"error": "Unauthorized"}, 401
+        
+    data = request.json
+    subject_name = data.get("subject")
+    topics_list = data.get("topics", []) # List of strings
+    
+    if not subject_name or not topics_list:
+        return {"error": "Subject and topics are required"}, 400
+        
+    topics = [{"name": t.strip(), "done": False} for t in topics_list if t.strip()]
+    
+    new_subject = {
+        "user_email": session.get("user_email"),
+        "subject": subject_name,
+        "total_topics": len(topics),
+        "completed_topics": 0,
+        "topics": topics,
+        "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "last_updated": datetime.datetime.now(datetime.timezone.utc).isoformat()
+    }
+    
+    study_progress_col.insert_one(new_subject)
+    return {"status": "success", "message": "Subject added successfully!"}
+
+@app.route("/api/study-progress/toggle-topic", methods=["POST"])
+def toggle_topic_api():
+    if "user" not in session:
+        return {"error": "Unauthorized"}, 401
+        
+    data = request.json
+    subject_id = data.get("subject_id")
+    topic_name = data.get("topic_name")
+    
+    from bson.objectid import ObjectId
+    subject = study_progress_col.find_one({"_id": ObjectId(subject_id), "user_email": session.get("user_email")})
+    
+    if not subject:
+        return {"error": "Subject not found"}, 404
+        
+    # Toggle topic
+    updated_topics = subject.get("topics", [])
+    completed_count = 0
+    for t in updated_topics:
+        if t["name"] == topic_name:
+            t["done"] = not t.get("done", False)
+        if t.get("done"):
+            completed_count += 1
+            
+    # Update Streak logic
+    user_email = session.get("user_email")
+    today = datetime.date.today().isoformat()
+    user = users_col.find_one({"email": user_email})
+    
+    current_streak = user.get("study_streak", 0)
+    last_study = user.get("last_study_date")
+    
+    if last_study != today:
+        if last_study == (datetime.date.today() - datetime.timedelta(days=1)).isoformat():
+            current_streak += 1
+        else:
+            current_streak = 1
+        
+        users_col.update_one(
+            {"email": user_email},
+            {"$set": {"study_streak": current_streak, "last_study_date": today}}
+        )
+
+    study_progress_col.update_one(
+        {"_id": ObjectId(subject_id)},
+        {"$set": {
+            "topics": updated_topics,
+            "completed_topics": completed_count,
+            "last_updated": datetime.datetime.now(datetime.timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"status": "success", "completed_topics": completed_count, "streak": current_streak}
+
+@app.route("/api/study-progress/delete/<subject_id>", methods=["POST"])
+def delete_subject_api(subject_id):
+    if "user" not in session:
+        return {"error": "Unauthorized"}, 401
+        
+    from bson.objectid import ObjectId
+    try:
+        study_progress_col.delete_one({"_id": ObjectId(subject_id), "user_email": session.get("user_email")})
+        return {"status": "success", "message": "Subject deleted!"}
+    except:
+        return {"error": "Failed to delete subject"}, 500
 
 # ================= UPLOAD NOTES =================
 @app.route("/upload-notes", methods=["GET", "POST"])

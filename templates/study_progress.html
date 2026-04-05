@@ -1,0 +1,493 @@
+{% extends "dashboard_base.html" %}
+
+{% block styles %}
+<style>
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border-glass);
+        padding: 25px;
+        border-radius: 20px;
+        text-align: center;
+        transition: 0.3s;
+        animation: fadeInUp 0.5s ease-out backwards;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+        box-shadow: 0 10px 30px rgba(56, 189, 248, 0.1);
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .subjects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 30px;
+    }
+
+    .subject-card {
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border-glass);
+        border-radius: 24px;
+        padding: 30px;
+        position: relative;
+        transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
+    }
+
+    .subject-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--primary);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .subject-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .progress-container {
+        margin-bottom: 25px;
+    }
+
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 14px;
+        color: #cbd5e1;
+    }
+
+    .progress-bar-bg {
+        height: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        border-radius: 10px;
+        transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 15px var(--primary);
+    }
+
+    .topics-list {
+        list-style: none;
+        max-height: 200px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+    .topic-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: 0.2s;
+    }
+
+    .topic-item:last-child { border: none; }
+
+    .topic-checkbox {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        transition: 0.3s;
+    }
+
+    .topic-checkbox:checked {
+        background: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .topic-checkbox:checked::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #020617;
+        font-size: 12px;
+        font-weight: 900;
+    }
+
+    .topic-name {
+        font-size: 14px;
+        color: #cbd5e1;
+        transition: 0.3s;
+    }
+
+    .topic-checkbox:checked + .topic-name {
+        color: #64748b;
+        text-decoration: line-through;
+    }
+
+    .add-subject-btn {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border: none;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 5px 15px rgba(56, 189, 248, 0.3);
+    }
+
+    .add-subject-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(56, 189, 248, 0.5);
+    }
+
+    /* Modal Styling */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-content {
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid var(--border-glass);
+        padding: 40px;
+        border-radius: 30px;
+        width: 100%;
+        max-width: 500px;
+        position: relative;
+        animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalIn {
+        from { opacity: 0; transform: scale(0.9) translateY(20px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 10px;
+    }
+
+    .input-group {
+        margin-bottom: 25px;
+    }
+
+    .input-label {
+        display: block;
+        font-size: 14px;
+        color: #94a3b8;
+        margin-bottom: 10px;
+    }
+
+    .modal-input {
+        width: 100%;
+        background: rgba(2, 6, 23, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 12px;
+        color: white;
+        outline: none;
+        transition: 0.3s;
+    }
+
+    .modal-input:focus {
+        border-color: var(--primary);
+    }
+
+    .btn-delete-subject {
+        background: none;
+        border: none;
+        color: #f43f5e;
+        opacity: 0.3;
+        cursor: pointer;
+        padding: 5px;
+        transition: 0.2s;
+    }
+
+    .subject-card:hover .btn-delete-subject {
+        opacity: 0.8;
+    }
+
+    .btn-delete-subject:hover {
+        opacity: 1 !important;
+        transform: scale(1.1);
+    }
+
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="progress-dashboard">
+    <div class="progress-header">
+        <div>
+            <h1 style="font-size: 36px; font-weight: 800; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Study Progress</h1>
+            <p style="color: #64748b; margin-top: 5px;">Track your journey to academic excellence.</p>
+        </div>
+        <button class="add-subject-btn" onclick="openModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Add Subject
+        </button>
+    </div>
+
+    <div class="stats-cards">
+        <div class="stat-card">
+            <span class="stat-value" id="stat-total-subjects">0</span>
+            <span class="stat-label">Total Subjects</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value" id="stat-overall-progress">0%</span>
+            <span class="stat-label">Overall Completion</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value" id="stat-streak">0</span>
+            <span class="stat-label">Study Streak 🔥</span>
+        </div>
+    </div>
+
+    <div class="subjects-grid" id="subjects-grid">
+        <!-- Rendered by JS -->
+        <div style="grid-column: 1/-1; text-align: center; padding: 100px; color: #64748b;">
+            Loading your progress...
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Adding Subject -->
+<div class="modal" id="addSubjectModal">
+    <div class="modal-content">
+        <button class="close-modal" onclick="closeModal()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <h2 style="font-size: 24px; margin-bottom: 25px;">New Subject</h2>
+        
+        <div class="input-group">
+            <label class="input-label">Subject Name</label>
+            <input type="text" id="subject-name" class="modal-input" placeholder="e.g. Physics, Data Structures">
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Topics (comma separated)</label>
+            <textarea id="topics-csv" class="modal-input" style="height: 120px; resize: none;" placeholder="e.g. Mechanics, Thermodynamics, Quantum Physics"></textarea>
+        </div>
+
+        <button class="add-subject-btn" style="width: 100%; justify-content: center; padding: 15px;" onclick="addSubject()">
+            Create Tracking
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function loadProgress() {
+        try {
+            const response = await fetch('/api/study-progress');
+            const data = await response.json();
+            
+            // Update stats
+            document.getElementById('stat-total-subjects').textContent = data.stats.total_subjects;
+            document.getElementById('stat-overall-progress').textContent = data.stats.overall_percentage + '%';
+            document.getElementById('stat-streak').textContent = data.stats.streak;
+
+            const grid = document.getElementById('subjects-grid');
+            grid.innerHTML = '';
+
+            if (data.subjects.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 80px; background: rgba(15,23,42,0.3); border-radius: 24px; border: 1px dashed var(--border-glass);">
+                        <p style="color: #94a3b8; font-size: 16px;">No subjects added yet. Start your journey!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            data.subjects.forEach(subject => {
+                const percentage = Math.round((subject.completed_topics / subject.total_topics) * 100) || 0;
+                
+                const card = document.createElement('div');
+                card.className = 'subject-card';
+                card.innerHTML = `
+                    <div class="subject-title">
+                        <span>${subject.subject}</span>
+                        <button class="btn-delete-subject" onclick="deleteSubject('${subject._id}')" title="Delete Subject">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-text">
+                            <span>Progress</span>
+                            <span>${percentage}%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 8px;">
+                            ${subject.completed_topics}/${subject.total_topics} topics finished
+                        </div>
+                    </div>
+                    <ul class="topics-list">
+                        ${subject.topics.map(topic => `
+                            <li class="topic-item">
+                                <input type="checkbox" class="topic-checkbox" 
+                                    ${topic.done ? 'checked' : ''} 
+                                    onchange="toggleTopic('${subject._id}', '${topic.name}')">
+                                <span class="topic-name">${topic.name}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                grid.appendChild(card);
+            });
+        } catch (err) {
+            console.error('Failed to load study progress:', err);
+        }
+    }
+
+    async function toggleTopic(subjectId, topicName) {
+        try {
+            const response = await fetch('/api/study-progress/toggle-topic', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ subject_id: subjectId, topic_name: topicName })
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                loadProgress(); // Reload to update UI
+                if(data.streak > parseInt(document.getElementById('stat-streak').textContent)) {
+                    showToast('Study streak updated! 🔥');
+                }
+            }
+        } catch (err) {
+            showToast('Failed to update progress.');
+        }
+    }
+
+    async function addSubject() {
+        const name = document.getElementById('subject-name').value;
+        const csv = document.getElementById('topics-csv').value;
+        
+        if (!name || !csv) {
+            showToast('Please fill all fields.');
+            return;
+        }
+
+        const topics = csv.split(',').map(t => t.trim()).filter(t => t);
+        
+        try {
+            const response = await fetch('/api/study-progress/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ subject: name, topics: topics })
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                closeModal();
+                loadProgress();
+                showToast('Subject added!');
+            }
+        } catch (err) {
+            showToast('Failed to add subject.');
+        }
+    }
+
+    async function deleteSubject(id) {
+        if (!confirm('Are you sure you want to delete this subject and all its progress?')) return;
+        
+        try {
+            const response = await fetch(`/api/study-progress/delete/${id}`, { method: 'POST' });
+            const data = await response.json();
+            if (data.status === 'success') {
+                loadProgress();
+                showToast('Subject deleted.');
+            }
+        } catch (err) {
+            showToast('Failed to delete subject.');
+        }
+    }
+
+    function openModal() {
+        document.getElementById('addSubjectModal').classList.add('active');
+        document.getElementById('subject-name').focus();
+    }
+
+    function closeModal() {
+        document.getElementById('addSubjectModal').classList.remove('active');
+        document.getElementById('subject-name').value = '';
+        document.getElementById('topics-csv').value = '';
+    }
+
+    document.addEventListener('DOMContentLoaded', loadProgress);
+</script>
+{% endblock %}
