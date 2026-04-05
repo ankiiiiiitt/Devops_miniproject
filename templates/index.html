@@ -185,7 +185,6 @@
                 <div class="dropdown-content">
                     <a href="#how-it-works">How it Works</a>
                     <a href="#tech-stack">Technology</a>
-                    <a href="#contact">Contact Support</a>
                 </div>
             </li>
             {% if session.get('user') %}
@@ -255,7 +254,7 @@
             <p style="color: #94a3b8; max-width: 700px; margin: 0 auto;">FocusVault is more than just an AI tool; it's a 3D cognitive workspace designed to help you master complex subjects through intelligent automation and immersive organization.</p>
         </div>
 
-        <div class="about-grid">
+        <div class="about-grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); max-width: 1000px; margin: 60px auto 0 auto;">
             <div class="about-card" id="how-it-works">
                 <h3>🚀 How it Works</h3>
                 <p>FocusVault uses advanced LLMs to analyze your study material, generate personalized plans, and provide instant Q&A support. Every note and chat is stored in your personal vault, accessible through our unique 3D interface.</p>
@@ -263,10 +262,6 @@
             <div class="about-card" id="tech-stack">
                 <h3>🛡️ Smart Security</h3>
                 <p>Your data is encrypted and stored securely. We use cutting-edge technology like Llama-3 and MongoDB to ensure your research and notes are always fast, reliable, and private.</p>
-            </div>
-            <div class="about-card" id="contact">
-                <h3>📧 Support & Contact</h3>
-                <p>Have questions or need a custom feature? Our team is active and ready to help. Contact us directly at <span style="color: var(--primary);">support@focusvault.ai</span> or check our documentation in the workspace.</p>
             </div>
         </div>
     </section>
