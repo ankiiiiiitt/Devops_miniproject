@@ -1,164 +1,54 @@
 {% extends "dashboard_base.html" %}
 
-{% block styles %}
-<style>
-    .chat-container {
-        width: 100%;
-        max-width: 900px;
-        margin: 0 auto;
-        height: calc(100vh - 120px);
-        display: flex;
-        flex-direction: column;
-        transform-style: preserve-3d;
-        perspective: 2000px;
-    }
-
-    .chat-history {
-        flex: 1;
-        background: rgba(15, 23, 42, 0.3);
-        backdrop-filter: blur(40px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 30px;
-        padding: 40px;
-        padding-bottom: 120px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-        box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
-        transform: translateZ(var(--p-card-z));
-    }
-
-    .chat-message {
-        max-width: 80%;
-        padding: 16px 24px;
-        border-radius: 20px;
-        font-size: 15px;
-        line-height: 1.6;
-        position: relative;
-        transform-style: preserve-3d;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        animation: bubblePop 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
-    }
-
-    @keyframes bubblePop {
-        from { opacity: 0; transform: translateY(30px) scale(0.8) translateZ(-50px); }
-        to { opacity: 1; transform: translateY(0) scale(1) translateZ(0); }
-    }
-
-    .chat-message.user {
-        align-self: flex-end;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: #020617;
-        font-weight: 600;
-        border-bottom-right-radius: 4px;
-        box-shadow: 0 10px 25px var(--primary-glow);
-        transform: translateZ(20px) rotateX(-2deg);
-    }
-
-    .chat-message.ai {
-        align-self: flex-start;
-        background: rgba(30, 41, 59, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #f1f5f9;
-        border-bottom-left-radius: 4px;
-        transform: translateZ(10px) rotateX(2deg);
-    }
-
-    .chat-message:hover {
-        transform: translateZ(40px) scale(1.02);
-    }
-
-    .chat-input-wrapper {
-        position: absolute;
-        bottom: 30px;
-        left: 40px;
-        right: 40px;
-        z-index: 100;
-        transform-style: preserve-3d;
-        transform: translateZ(60px);
-    }
-
-    .chat-input-box {
-        background: rgba(15, 23, 42, 0.8);
-        backdrop-filter: blur(50px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 100px;
-        padding: 10px 14px 10px 30px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-    }
-
-    .chat-input-box:focus-within {
-        border-color: var(--primary);
-        box-shadow: 0 0 40px var(--primary-glow), 0 20px 60px rgba(0, 0, 0, 0.7);
-        transform: translateY(-5px) scale(1.02);
-    }
-
-    #chatInput {
-        background: transparent;
-        border: none;
-        color: white;
-        flex: 1;
-        outline: none;
-        font-size: 16px;
-        padding: 12px 0;
-    }
-
-    #sendBtn {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        border: none;
-        color: white;
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: 0.3s;
-    }
-
-    #sendBtn:hover {
-        transform: rotate(-10deg) scale(1.1);
-        box-shadow: 0 0 20px var(--primary);
-    }
-
-    .ai-typing-indicator {
-        font-size: 12px;
-        color: var(--primary);
-        margin-top: -15px;
-        margin-left: 5px;
-        display: none;
-        animation: pulse 1s infinite alternate;
-    }
-
-    @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="chat-container">
+    <!-- MESSAGING AREA -->
     <div class="chat-history" id="chatHistory">
-        {% for msg in messages %}
-            <div class="chat-message {{ msg.role }}">
-                <div class="bubble-content">
-                    {{ msg.content | safe }}
+        {% if messages %}
+            {% for msg in messages %}
+                {% if msg.role != 'system' %}
+                <div class="chat-message {{ 'user' if msg.role == 'user' else 'ai' }}">
+                    <div class="bubble-content">{{ msg.content | safe if msg.role == 'assistant' else msg.content }}</div>
+                    {% if msg.role == 'assistant' %}
+                    <div class="chat-message-actions">
+                        <button class="btn-bookmark" 
+                            data-content="{{ msg.content }}" 
+                            data-type="AI Chat Response"
+                            onclick="handleBookmarkClick(this)" title="Bookmark this response">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                        </button>
+                    </div>
+                    {% endif %}
                 </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+        <div class="chat-message ai" id="welcomeMessage">
+            <div class="bubble-content">
+                Hello {{ session.get('user', 'there') }}! I'm your AI study assistant. How can I help you focus and learn today?
             </div>
-        {% endfor %}
+            <div class="chat-message-actions">
+                <button class="btn-bookmark" 
+                    data-content="Hello {{ session.get('user', 'there') }}! I'm your AI study assistant. How can I help you focus and learn today?" 
+                    data-type="AI Chat Response"
+                    onclick="handleBookmarkClick(this)" title="Bookmark this response">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                </button>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
-    <div class="ai-typing-indicator" id="typingIndicator">FocusVault is thinking...</div>
-
+    <!-- STICKY PILL INPUT -->
     <div class="chat-input-wrapper">
         <div class="chat-input-box">
-            <textarea id="chatInput" placeholder="Ask your AI Study Assistant anything..." rows="1"></textarea>
-            <button id="sendBtn" title="Send Message">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            <textarea id="chatInput" placeholder="Ask FocusVault AI anything..." rows="1" 
+                oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+            <button id="sendBtn" onclick="sendMessage()" title="Send Message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
             </button>
         </div>
     </div>
@@ -167,62 +57,144 @@
 
 {% block scripts %}
 <script>
+    const chatHistory = document.getElementById('chatHistory');
     const chatInput = document.getElementById('chatInput');
     const sendBtn = document.getElementById('sendBtn');
-    const chatHistory = document.getElementById('chatHistory');
-    const typingIndicator = document.getElementById('typingIndicator');
-    const chatID = "{{ chat_id or '' }}";
+    
+    let currentChatId = "{{ chat_id if chat_id else '' }}";
 
-    function appendMessage(role, content) {
-        const msg = document.createElement('div');
-        msg.className = `chat-message ${role}`;
-        msg.innerHTML = `<div class="bubble-content">${content}</div>`;
-        chatHistory.appendChild(msg);
-        chatHistory.scrollTop = chatHistory.scrollHeight;
-    }
-
-    async function sendMessage() {
-        const message = chatInput.value.trim();
-        if(!message) return;
-
-        chatInput.value = '';
-        appendMessage('user', message);
-        
-        typingIndicator.style.display = 'block';
-        chatHistory.scrollTop = chatHistory.scrollHeight;
-
-        try {
-            const response = await fetch('/chat_api', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message, chat_id: chatID })
-            });
-            const data = await response.json();
-            
-            typingIndicator.style.display = 'none';
-            if(data.reply) {
-                appendMessage('ai', data.reply);
-                if(!chatID && data.chat_id) {
-                    window.location.href = `/chat/${data.chat_id}`;
-                }
-            } else {
-                appendMessage('ai', 'Oops, something went wrong.');
-            }
-        } catch (err) {
-            typingIndicator.style.display = 'none';
-            appendMessage('ai', 'Failed to connect to AI.');
-        }
-    }
-
-    sendBtn.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keydown', (e) => {
-        if(e.key === 'Enter' && !e.shiftKey) {
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
         }
     });
 
-    // Auto-scroll on load
-    chatHistory.scrollTop = chatHistory.scrollHeight;
+    async function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+
+        appendMessage(text, 'user');
+
+        // Show thinking animation
+        const thinkingId = 'thinking-' + Date.now();
+        const thinkingDiv = document.createElement('div');
+        thinkingDiv.className = 'chat-message ai';
+        thinkingDiv.id = thinkingId;
+        thinkingDiv.innerHTML = `<div class="ai-typing-indicator"><span></span><span></span><span></span></div>`;
+        chatHistory.appendChild(thinkingDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+
+        try {
+            const payload = { message: text };
+            if (currentChatId) {
+                payload.chat_id = currentChatId;
+            }
+
+            const response = await fetch('/chat_api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.reply) {
+                    if (!currentChatId && data.chat_id) {
+                        currentChatId = data.chat_id;
+                        window.history.pushState({}, '', '/chat/' + currentChatId);
+                    }
+                    thinkingDiv.remove();
+                    appendMessage(data.reply, 'ai');
+                } else {
+                    thinkingDiv.remove();
+                    appendMessage('Sorry, something went wrong.', 'ai');
+                }
+            } else {
+                thinkingDiv.remove();
+                appendMessage('Failed to connect to AI server.', 'ai');
+            }
+        } catch (err) {
+            thinkingDiv.remove();
+            appendMessage('Failed to connect to AI server.', 'ai');
+        }
+    }
+
+    function appendMessage(text, sender, id = null) {
+        const div = document.createElement('div');
+        div.className = `chat-message ${sender}`;
+        if (id) div.id = id;
+        
+        const content = document.createElement('div');
+        content.className = 'bubble-content';
+        if (sender === 'ai') {
+            content.innerHTML = text;
+        } else {
+            content.textContent = text;
+        }
+        div.appendChild(content);
+        
+        if (sender === 'ai' && !id) {
+            addMessageActions(div, text);
+        }
+        
+        chatHistory.appendChild(div);
+        scrollToBottom();
+    }
+
+    function typeMessage(text, sender) {
+        const div = document.createElement('div');
+        div.className = `chat-message ${sender}`;
+        
+        const content = document.createElement('div');
+        content.className = 'bubble-content';
+        div.appendChild(content);
+        chatHistory.appendChild(div);
+        
+        let index = 0;
+        const speed = 15;
+
+        function type() {
+            if (index < text.length) {
+                content.textContent += text.charAt(index);
+                index++;
+                scrollToBottom();
+                setTimeout(type, speed);
+            } else {
+                addMessageActions(div, text);
+            }
+        }
+        type();
+    }
+
+    function addMessageActions(div, text) {
+        const actions = document.createElement('div');
+        actions.className = 'chat-message-actions';
+        
+        const bMark = document.createElement('button');
+        bMark.className = 'btn-bookmark';
+        bMark.title = 'Bookmark this response';
+        bMark.setAttribute('data-content', text);
+        bMark.setAttribute('data-type', 'AI Chat Response');
+        bMark.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>`;
+        bMark.onclick = (e) => { e.stopPropagation(); handleBookmarkClick(bMark); };
+        
+        actions.appendChild(bMark);
+        div.appendChild(actions);
+    }
+
+    function scrollToBottom() {
+        chatHistory.scrollTo({
+            top: chatHistory.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    });
 </script>
 {% endblock %}
