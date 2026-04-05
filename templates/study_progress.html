@@ -111,11 +111,17 @@
         transition: 0.3s;
         border: 1px solid transparent;
         cursor: pointer;
+        position: relative;
+        z-index: 10;
+        pointer-events: auto;
+        user-select: none;
+        transform: translateZ(10px); /* Force in front of card surface */
     }
 
     .topic-item:hover {
         background: rgba(255, 255, 255, 0.08);
-        transform: translateX(10px) translateZ(20px);
+        transform: translateX(8px) translateZ(15px); /* Maintain elevation */
+        border-color: rgba(56, 189, 248, 0.3);
     }
 
     .topic-item.done {
@@ -124,14 +130,15 @@
     }
 
     .neon-checkbox {
-        width: 22px;
-        height: 22px;
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        border-radius: 7px;
+        width: 24px;   /* Slightly larger */
+        height: 24px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: 0.3s;
+        flex-shrink: 0;
     }
 
     .topic-item.done .neon-checkbox {
