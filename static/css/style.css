@@ -111,43 +111,104 @@ a {
   }
 }
 
-/* ================= DASHBOARD LAYOUT ================= */
+/* ================= DASHBOARD LAYOUT (3D PERSPECTIVE) ================= */
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
-  perspective: 1200px;
+  padding: 25px;
+  gap: 25px;
+  perspective: 2000px;
+  overflow: hidden;
 }
 
-/* ================= FLOATING GLASS SIDEBAR ================= */
+/* ================= FLOATING GLASS BLADE SIDEBAR ================= */
 .sidebar {
   width: var(--sidebar-w);
-  height: calc(100vh - 40px);
-  margin: 20px;
+  height: calc(100vh - 50px);
   background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(25px);
+  backdrop-filter: blur(40px);
   border: 1px solid var(--border-glass);
-  border-radius: 20px;
+  border-radius: 40px;
   display: flex;
   flex-direction: column;
-  transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 1000;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   position: sticky;
-  top: 20px;
+  top: 0;
+  transform-style: preserve-3d;
 }
 
 .sidebar-logo {
-  padding: 30px;
+  padding: 40px 35px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-weight: 800;
+  font-size: 24px;
+  text-decoration: none;
+  color: white;
+  transform: translateZ(50px);
+}
+
+.sidebar-logo img {
+  width: 38px;
+  filter: drop-shadow(0 0 10px var(--primary));
+}
+
+/* Sidebar Nav Pills */
+.sidebar-nav {
+  list-style: none;
+  padding: 0 15px;
+  flex-grow: 1;
+  transform: translateZ(30px);
+}
+
+.sidebar-nav li a {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-weight: 700;
-  font-size: 22px;
+  padding: 14px 20px;
+  color: #94a3b8;
   text-decoration: none;
-  background: linear-gradient(to right, #fff, var(--primary));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  border-radius: 18px;
+  transition: 0.3s;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.sidebar-nav li a:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.sidebar-nav li a.active {
+  background: rgba(56, 189, 248, 0.1);
+  color: var(--primary);
+  border-left: 3px solid var(--primary);
+  box-shadow: inset 0 0 15px rgba(56, 189, 248, 0.05);
+}
+
+.new-chat-btn {
+  margin: 0 20px 25px;
+  padding: 15px;
+  background: linear-gradient(135deg, var(--primary), #2563eb);
+  color: #020617;
+  text-decoration: none;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 700;
+  box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3);
+  transition: 0.3s;
+  transform: translateZ(40px);
+}
+
+.new-chat-btn:hover {
+  transform: translateZ(45px) translateY(-3px);
+  box-shadow: 0 15px 30px rgba(56, 189, 248, 0.4);
 }
 
 .sidebar-logo img {

@@ -152,10 +152,63 @@
     }
 </script>
 
-<!-- Toast Container for global notifications -->
+<!-- Toast System -->
+<style>
+    .toast-container {
+        position: fixed;
+        top: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        pointer-events: none;
+    }
+    .toast {
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 12px 24px;
+        border-radius: 100px;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        animation: toastIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        pointer-events: auto;
+    }
+    @keyframes toastIn {
+        from { opacity: 0; transform: translateY(-40px) scale(0.9); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+</style>
+
 <div id="toast-container" class="toast-container"></div>
 
 <script>
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        const icon = type === 'success' 
+            ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>`
+            : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-20px) scale(0.9)';
+            toast.style.transition = '0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            setTimeout(() => toast.remove(), 400);
+        }, 3500);
+    }
+
     async function saveBookmark(title, content, type) {
         try {
             const response = await fetch('/bookmark', {
@@ -167,12 +220,11 @@
             if (data.status === 'success') {
                 showToast('Bookmarked successfully!');
                 return true;
-            } else {
-                showToast('Error: ' + data.error);
-                return false;
             }
+            showToast('Error: ' + data.error, 'error');
+            return false;
         } catch (err) {
-            showToast('Failed to bookmark.');
+            showToast('Failed to bookmark.', 'error');
             return false;
         }
     }
@@ -181,41 +233,16 @@
         const title = btn.getAttribute('data-title') || '';
         const content = btn.getAttribute('data-content') || '';
         const type = btn.getAttribute('data-type') || 'AI Answer';
-        
-        if (!content) {
-            showToast('Nothing to bookmark.');
-            return;
-        }
-        
+        if (!content) { showToast('Nothing to bookmark.', 'error'); return; }
         btn.disabled = true;
         btn.style.opacity = '0.5';
-        
         const success = await saveBookmark(title, content, type);
         if (success) {
             btn.classList.add('active');
-            // Change icon to filled
             btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>`;
         }
-        
         btn.disabled = false;
         btn.style.opacity = '1';
-    }
-
-    function showToast(message) {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
-        
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> <span>${message}</span>`;
-        container.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(20px)';
-            toast.style.transition = '0.5s ease';
-            setTimeout(() => toast.remove(), 500);
-        }, 3000);
     }
 </script>
 </body>
