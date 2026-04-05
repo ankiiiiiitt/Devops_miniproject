@@ -1,59 +1,247 @@
 {% extends "dashboard_base.html" %}
 
 {% block content %}
-<div class="tool-container-flex">
-    <div class="notes-container">
-        <!-- New Note Form -->
-        <div class="note-form-box glass">
-            <h2 style="margin-bottom: 20px; font-weight: 500; font-size: 24px; color: #38bdf8;">Write a Note ✏️</h2>
-            <form action="{{ url_for('notes') }}" method="POST">
-                <input type="text" name="title" placeholder="Note Title..." class="note-input-title" required>
-                <textarea name="content" placeholder="Start typing your note here..." class="note-input-content" rows="4" required></textarea>
-                <div style="text-align: right; margin-top: 15px;">
-                    <button type="submit" class="btn btn-primary" style="padding: 12px 25px; font-weight: 500; background: #38bdf8; color: #020617; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s;">Save Note</button>
-                </div>
-            </form>
-        </div>
+<div class="notes-container">
+    <!-- NEW NOTE FORM (3D Glass Card) -->
+    <div class="note-form-box">
+        <h2 style="margin-bottom: 25px; font-weight: 700; font-size: 28px; color: var(--primary); text-shadow: 0 0 15px rgba(56,189,248,0.3);">
+            Capture your thoughts ✏️
+        </h2>
+        <form action="{{ url_for('notes') }}" method="POST">
+            <input type="text" name="title" placeholder="Note Title..." class="note-input-title" required>
+            <textarea name="content" placeholder="Start typing your futuristic notes here..." class="note-input-content" rows="5" required></textarea>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px;">
+                <button type="submit" class="new-chat-btn" style="margin: 0; padding: 12px 30px; border: none; cursor: pointer;">
+                    Save Note
+                </button>
+            </div>
+        </form>
+    </div>
 
-        <!-- Saved Notes Grid -->
+    <!-- SAVED NOTES GRID -->
+    <div class="notes-grid" id="notesGrid">
         {% if notes %}
-        <div class="notes-grid">
             {% for note in notes %}
-            <div class="note-card glass">
+            <div class="note-card-3d" 
+                 data-id="{{ note._id }}" 
+                 data-title="{{ note.title }}" 
+                 data-content="{{ note.content }}"
+                 data-tags='{{ note.tags|tojson }}'
+                 onclick="openNoteEditor('{{ note._id }}')">
+                
                 <div class="note-card-header">
                     <h3 class="note-title">{{ note.title }}</h3>
-                    <div style="display: flex; gap: 8px;">
-                        <button type="button" class="btn-bookmark" 
-                            data-title="{{ note.title }}" 
-                            data-content="{{ note.content }}" 
-                            data-type="User Note"
-                            onclick="handleBookmarkClick(this)" title="Bookmark Note">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-                        </button>
-                        <form action="{{ url_for('delete_note', note_id=note._id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this note?');" style="margin: 0;">
-                            <button type="submit" class="btn-delete" title="Delete Note">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                            </button>
-                        </form>
+                    <div class="note-tags">
+                        {% if 'important' in note.tags %}
+                            <span class="tag important">🔥 Important</span>
+                        {% endif %}
+                        {% if 'pinned' in note.tags %}
+                            <span class="tag pinned">📌 Pinned</span>
+                        {% endif %}
                     </div>
                 </div>
-                <div class="note-content">
+
+                <div class="note-preview">
                     {{ note.content }}
                 </div>
-                <div class="note-date">
-                    {{ note.created_at[:10] }}
+
+                <div class="note-meta">
+                    <span>{{ note.created_at[:10] }}</span>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-bookmark" style="padding: 5px;" onclick="event.stopPropagation(); handleBookmarkClick(this)" 
+                                data-title="{{ note.title }}" data-content="{{ note.content }}" data-type="Note">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
             {% endfor %}
-        </div>
         {% else %}
-        <div class="no-notes-message glass" style="padding: 30px; border-radius: 12px; margin-top: 30px; text-align: center;">
-            <p style="color: #94a3b8; margin: 0;">You haven't saved any notes yet. Write your first note above!</p>
-        </div>
+            <div class="glass" style="grid-column: 1/-1; padding: 60px; border-radius: 24px; text-align: center; color: #64748b;">
+                <p style="font-size: 18px;">Your digital vault is empty. Write your first note above! 🚀</p>
+            </div>
         {% endif %}
     </div>
 </div>
+
+<!-- FULL SCREEN MODAL EDITOR -->
+<div id="noteModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button class="btn-outline" style="padding: 8px 15px; font-size: 13px;" onclick="closeNoteEditor()">
+                ← Back to Workspace
+            </button>
+            <div style="display: flex; gap: 15px;">
+                <button id="aiSummarizeBtn" class="btn" style="background: rgba(168, 85, 247, 0.2); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.4);" onclick="summarizeNote()">
+                    ✨ AI Summarize
+                </button>
+                <button class="btn" style="background: var(--primary); color: #020617; font-weight: 600;" onclick="saveNoteChanges()">
+                    Save Changes
+                </button>
+                <form id="deleteNoteForm" method="POST" style="margin: 0;">
+                    <button type="submit" class="btn" style="background: rgba(244, 63, 94, 0.2); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.4);">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal-body">
+            <input type="text" id="modalTitle" class="modal-title-input" placeholder="Untitled Note">
+            <div id="modalTags" style="display: flex; gap: 10px; margin-bottom: 25px;">
+                <button class="tag" id="tagImportant" onclick="toggleTag('important')">🔥 Important</button>
+                <button class="tag" id="tagPinned" onclick="toggleTag('pinned')">📌 Pinned</button>
+            </div>
+            <textarea id="modalContent" class="modal-content-textarea" placeholder="Start your deep work here..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+            <div id="modalStatus" style="font-size: 13px; color: #64748b;"></div>
+            <div id="lastEdited" style="font-size: 12px; color: #475569;"></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let currentNoteId = null;
+    let currentTags = [];
+
+    function openNoteEditor(id) {
+        const card = document.querySelector(`.note-card-3d[data-id="${id}"]`);
+        if (!card) return;
+
+        currentNoteId = id;
+        currentTags = JSON.parse(card.getAttribute('data-tags') || '[]');
+        
+        document.getElementById('modalTitle').value = card.getAttribute('data-title');
+        document.getElementById('modalContent').value = card.getAttribute('data-content');
+        document.getElementById('deleteNoteForm').action = `/notes/delete/${id}`;
+        
+        updateTagUI();
+        
+        document.getElementById('noteModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeNoteEditor() {
+        document.getElementById('noteModal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+        currentNoteId = null;
+    }
+
+    function toggleTag(tagName) {
+        if (currentTags.includes(tagName)) {
+            currentTags = currentTags.filter(t => t !== tagName);
+        } else {
+            currentTags.push(tagName);
+        }
+        updateTagUI();
+    }
+
+    function updateTagUI() {
+        const impBtn = document.getElementById('tagImportant');
+        const pinBtn = document.getElementById('tagPinned');
+        
+        impBtn.className = currentTags.includes('important') ? 'tag important' : 'tag';
+        pinBtn.className = currentTags.includes('pinned') ? 'tag pinned' : 'tag';
+    }
+
+    async function saveNoteChanges() {
+        if (!currentNoteId) return;
+
+        const title = document.getElementById('modalTitle').value;
+        const content = document.getElementById('modalContent').value;
+        const status = document.getElementById('modalStatus');
+
+        status.textContent = 'Saving to FocusVault...';
+
+        try {
+            const response = await fetch(`/notes/update/${currentNoteId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, content, tags: currentTags })
+            });
+
+            const data = await response.json();
+            if (data.status === 'success') {
+                status.textContent = 'Changes saved successfully! ✨';
+                showToast('Note synced successfully');
+                
+                // Update local grid card without refresh
+                const card = document.querySelector(`.note-card-3d[data-id="${currentNoteId}"]`);
+                if (card) {
+                    card.setAttribute('data-title', title);
+                    card.setAttribute('data-content', content);
+                    card.setAttribute('data-tags', JSON.stringify(currentTags));
+                    card.querySelector('.note-title').textContent = title;
+                    card.querySelector('.note-preview').textContent = content;
+                    
+                    // Update tags in grid
+                    const tagsContainer = card.querySelector('.note-tags');
+                    tagsContainer.innerHTML = '';
+                    if (currentTags.includes('important')) tagsContainer.innerHTML += '<span class="tag important">🔥 Important</span>';
+                    if (currentTags.includes('pinned')) tagsContainer.innerHTML += '<span class="tag pinned">📌 Pinned</span>';
+                }
+                
+                setTimeout(() => { if(status.textContent.includes('saved')) status.textContent = ''; }, 3000);
+            }
+        } catch (err) {
+            status.textContent = 'Error saving note. Check connection.';
+        }
+    }
+
+    async function summarizeNote() {
+        if (!currentNoteId) return;
+        
+        const btn = document.getElementById('aiSummarizeBtn');
+        const originalText = btn.textContent;
+        btn.textContent = '✨ AI Thinking...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(`/api/notes/summarize/${currentNoteId}`, { method: 'POST' });
+            const data = await response.json();
+            
+            if (data.summary) {
+                const modalContent = document.getElementById('modalContent');
+                modalContent.value += `\n\n--- AI SUMMARY ---\n${data.summary}`;
+                showToast('Summary appended to note!');
+            }
+        } catch (err) {
+            showToast('AI Summarization failed.');
+        } finally {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    // Close on ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeNoteEditor();
+    });
+
+    // Initial 3D Tilt Logic
+    document.addEventListener('mousemove', (e) => {
+        const cards = document.querySelectorAll('.note-card-3d');
+        cards.forEach(card => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            if (x > 0 && x < rect.width && y > 0 && y < rect.height) {
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -10;
+                const rotateY = ((x - centerX) / centerX) * 10;
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-12px) scale(1.02)`;
+            } else {
+                card.style.transform = '';
+            }
+        });
+    });
+</script>
 {% endblock %}

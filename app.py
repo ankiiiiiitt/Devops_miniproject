@@ -80,11 +80,16 @@ def notes():
                 "user_email": session.get("user_email"),
                 "title": title,
                 "content": content,
-                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+                "tags": [],
+                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
             })
         return redirect(url_for("notes"))
         
-    user_notes = list(notes_col.find({"user_email": session.get("user_email")}).sort("created_at", -1))
+    user_notes = list(notes_col.find({"user_email": session.get("user_email")}).sort("updated_at", -1))
+    # Convert ObjectId to string for frontend JS
+    for n in user_notes:
+        n["_id"] = str(n["_id"])
     return render_template("notes.html", notes=user_notes)
 
 @app.route("/notes/delete/<note_id>", methods=["POST"])
@@ -98,6 +103,53 @@ def delete_note(note_id):
     except:
         pass
     return redirect(url_for("notes"))
+
+@app.route("/notes/update/<note_id>", methods=["POST"])
+def update_note(note_id):
+    if "user" not in session:
+        return {"error": "Unauthorized"}, 401
+    
+    data = request.json
+    title = data.get("title")
+    content = data.get("content")
+    tags = data.get("tags", [])
+    
+    if not content:
+        return {"error": "Content is required"}, 400
+        
+    from bson.objectid import ObjectId
+    import datetime
+    try:
+        notes_col.update_one(
+            {"_id": ObjectId(note_id), "user_email": session.get("user_email")},
+            {"$set": {
+                "title": title,
+                "content": content,
+                "tags": tags,
+                "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+            }}
+        )
+        return {"status": "success", "message": "Note updated successfully!"}
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+@app.route("/api/notes/summarize/<note_id>", methods=["POST"])
+def summarize_note_api(note_id):
+    if "user" not in session:
+        return {"error": "Unauthorized"}, 401
+        
+    from bson.objectid import ObjectId
+    note = notes_col.find_one({"_id": ObjectId(note_id), "user_email": session.get("user_email")})
+    
+    if not note:
+        return {"error": "Note not found"}, 404
+        
+    content = note.get("content", "")
+    if not content:
+        return {"error": "No content to summarize"}, 400
+        
+    summary = ask_ai(f"Summarize this note in 3-5 concise bullet points:\n{content}")
+    return {"summary": summary}
 
 # ================= BOOKMARKS =================
 @app.route("/bookmark", methods=["POST"])
