@@ -4,11 +4,21 @@
 
 :root {
   --primary: #38bdf8;
+  --primary-glow: rgba(56, 189, 248, 0.5);
   --secondary: #a855f7;
+  --secondary-glow: rgba(168, 85, 247, 0.5);
+  --accent: #22d3ee;
   --bg-deep: #020617;
   --sidebar-w: 280px;
   --card-glass: rgba(15, 23, 42, 0.4);
   --border-glass: rgba(255, 255, 255, 0.08);
+  --glass-reflection: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  
+  /* 3D WORKSPACE TOKENS */
+  --p-perspective: 2000px;
+  --p-card-z: 40px;
+  --p-sidebar-z: 80px;
+  --p-float-y: 10px;
 }
 
 * {
@@ -97,6 +107,15 @@ a {
   animation: floatOrb 30s infinite alternate;
 }
 
+/* 3D Perspective Wrapper */
+.three-d-workspace {
+  perspective: var(--p-perspective);
+  perspective-origin: center center;
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
 @keyframes floatOrb {
   0% {
     transform: translate(0, 0) scale(1);
@@ -118,22 +137,28 @@ a {
   perspective: 1200px;
 }
 
-/* ================= FLOATING GLASS SIDEBAR ================= */
+/* ================= FLOATING GLASS SIDEBAR (3D BLADE) ================= */
 .sidebar {
   width: var(--sidebar-w);
   height: calc(100vh - 40px);
   margin: 20px;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(25px);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid var(--border-glass);
   border-radius: 20px;
   display: flex;
   flex-direction: column;
-  transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
   position: sticky;
   top: 20px;
+  transform-style: preserve-3d;
+  transform: translateZ(var(--p-sidebar-z)) rotateY(-5deg);
+}
+
+.sidebar:hover {
+  transform: translateZ(calc(var(--p-sidebar-z) + 10px)) rotateY(0deg);
 }
 
 .sidebar-logo {
@@ -446,9 +471,9 @@ a {
 
 .chat-history {
   flex: 1;
-  background: rgba(15, 23, 42, 0.35);
-  backdrop-filter: blur(30px);
-  border: 1px solid var(--border-glass);
+  background: rgba(30, 41, 59, 0.2);
+  backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 30px;
   padding: 30px;
   padding-bottom: 100px; /* Space for sticky input */
@@ -457,7 +482,8 @@ a {
   flex-direction: column;
   gap: 25px;
   margin-bottom: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+  transform: translateZ(var(--p-card-z));
   scrollbar-gutter: stable;
 }
 
@@ -850,6 +876,26 @@ a {
   position: sticky;
   top: 0;
   transform-style: preserve-3d;
+}
+
+.note-card {
+  background: rgba(15, 23, 42, 0.3);
+  backdrop-filter: blur(30px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.note-card:hover {
+  transform: translateY(-8px) translateZ(30px);
+  border-color: var(--primary-glow);
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5), 0 0 20px var(--primary-glow);
 }
 
 .dashboard-page .sidebar-logo {
