@@ -54,10 +54,12 @@
         </ul>
 
         <div class="sidebar-footer">
-            <div class="user-profile">
+            <div class="user-profile" style="flex-direction: column; align-items: flex-start;">
                 {% if session.get('user') %}
-                    <span class="user-profile-name">hi, {{ session.get('user') }}</span>
-                    <a href="{{ url_for('logout') }}" class="logout-btn" style="text-decoration: none; font-size: 13px;">Logout</a>
+                    <a href="{{ url_for('logout') }}" class="logout-btn" style="text-decoration: none; font-size: 14px; color: #f43f5e; font-weight: 600;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; vertical-align:middle;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        Logout
+                    </a>
                 {% else %}
                     <a href="{{ url_for('login') }}" style="color: #38bdf8; text-decoration: none;">Login</a>
                 {% endif %}
@@ -67,13 +69,29 @@
 
     <!-- MAIN CONTENT -->
     <main class="main-content" id="main-content">
-        <button class="sidebar-toggle-btn" id="sidebarToggle" title="Toggle Sidebar">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-        </button>
+        <header class="top-navbar">
+            <div class="top-nav-left">
+                <button class="sidebar-toggle-btn" id="sidebarToggle" title="Toggle Sidebar">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <div class="user-greeting">
+                    hi, <span class="accent-name">{{ session.get('user') }}</span>
+                </div>
+            </div>
+
+            <div class="top-nav-right">
+                <div class="streak-badge" title="Maintain your daily focus streak">
+                    <span class="streak-icon">🔥</span>
+                    <span class="streak-count">{{ streak }}</span>
+                    <span class="streak-label">Day Streak</span>
+                </div>
+            </div>
+        </header>
+
         {% block content %}{% endblock %}
     </main>
 </div>

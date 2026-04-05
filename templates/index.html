@@ -183,6 +183,13 @@
             <li><a href="#features">Features</a></li>
             <li><a href="#about">About</a></li>
             {% if session.get('user') %}
+                <li class="user-greeting" style="font-size: 14px; margin-right: 10px;">hi, <span class="accent-name">{{ session.get('user') }}</span></li>
+                <li>
+                    <div class="streak-badge" style="padding: 4px 12px; transform: scale(0.9);">
+                        <span class="streak-icon">🔥</span>
+                        <span class="streak-count">{{ streak }}</span>
+                    </div>
+                </li>
                 <li><a href="{{ url_for('chat') }}" class="btn-premium ghost">Workspace</a></li>
             {% else %}
                 <li><a href="{{ url_for('login') }}" class="btn-premium ghost">Sign In</a></li>

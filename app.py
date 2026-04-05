@@ -81,6 +81,14 @@ def ask_ai(prompt):
     cache_col.insert_one({"prompt": prompt, "response": formatted_text})
     return formatted_text
 
+# ================= CONTEXT PROCESSOR =================
+@app.context_processor
+def inject_global_vars():
+    if "user_email" in session:
+        user = users_col.find_one({"email": session["user_email"]})
+        streak = user.get("study_streak", 0) if user else 0
+        return {"streak": streak}
+    return {"streak": 0}
 
 # ================= ROUTES =================
 
