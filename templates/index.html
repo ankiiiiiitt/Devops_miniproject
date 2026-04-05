@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>FocusVault</title>
@@ -8,108 +9,110 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="{{ url_for('static', filename='js/ui_effects.js') }}"></script>
 </head>
+
 <body>
 
-<!-- BACKGROUND BLUR -->
-<div class="bg-glow blue"></div>
-<div class="bg-glow purple"></div>
+    <!-- BACKGROUND BLUR -->
+    <div class="bg-glow blue"></div>
+    <div class="bg-glow purple"></div>
 
-<!-- NAVBAR -->
-<nav class="navbar">
-    <div class="logo-box">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="FocusVault Logo">
-        <span>FocusVault</span>
-    </div>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo-box">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="FocusVault Logo">
+            <span>FocusVault</span>
+        </div>
 
-    <ul class="nav-links">
-        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
 
-        {% if user %}
+            {% if user %}
             <li class="user-name">Hi, {{ user }}</li>
             <li><a href="{{ url_for('chat') }}" style="color: #38bdf8; font-weight: 500;">Open Workspace 🚀</a></li>
             <li><a href="{{ url_for('logout') }}" class="logout-btn">Logout</a></li>
-        {% else %}
+            {% else %}
             <li><a href="{{ url_for('login') }}">Login</a></li>
-        {% endif %}
-    </ul>
-</nav>
+            {% endif %}
+        </ul>
+    </nav>
 
-<!-- HERO SECTION -->
-<section class="hero">
+    <!-- HERO SECTION -->
+    <section class="hero">
 
-    <div class="hero-text">
-        <div class="hero-heading-wrapper" id="heroHeading">
-            <h1 class="hero-3d-text">
-                <span class="line">
-                    <span class="word">Focus</span>
-                    <span class="word">Better.</span>
-                </span>
-                <span class="line gradient">
-                    <span class="word">Learn</span>
-                    <span class="word">Smarter.</span>
-                </span>
-            </h1>
+        <div class="hero-text">
+            <div class="hero-heading-wrapper" id="heroHeading">
+                <h1 class="hero-3d-text">
+                    <span class="line">
+                        <span class="word">Focus</span>
+                        <span class="word">Better.</span>
+                    </span>
+                    <span class="line gradient">
+                        <span class="word">Learn</span>
+                        <span class="word">Smarter.</span>
+                    </span>
+                </h1>
+            </div>
+
+            <p>
+                Your AI-powered study assistant that helps you summarize,
+                generate questions, and plan studies — faster and smarter.
+            </p>
+
+            <div class="hero-actions">
+                <a href="#features" class="btn">Explore Features</a>
+            </div>
+
         </div>
 
-        <p>
-            Your AI-powered study assistant that helps you summarize,
-            generate questions, and plan studies — faster and smarter.
-        </p>
-
-        <div class="hero-actions">
-            <a href="#features" class="btn">Explore Features</a>
+        <div class="hero-video">
+            <video autoplay muted loop playsinline>
+                <source src="{{ url_for('static', filename='videos/hero.mp4') }}" type="video/mp4">
+            </video>
         </div>
 
-    </div>
+    </section>
 
-    <div class="hero-video">
-        <video autoplay muted loop playsinline>
-            <source src="{{ url_for('static', filename='videos/hero.mp4') }}" type="video/mp4">
-        </video>
-    </div>
+    <!-- FEATURES -->
+    <section class="features" id="features">
 
-</section>
+        <a href="/upload-notes" class="card glass">
+            <h3>Upload PDF Notes</h3>
+            <p>Auto-generate summaries and exam questions directly from your PDF documents.</p>
+        </a>
 
-<!-- FEATURES -->
-<section class="features" id="features">
+        <a href="/summarizer" class="card glass">
+            <h3>Smart Summarizer</h3>
+            <p>Turn long notes into short, exam-ready summaries instantly.</p>
+        </a>
 
-    <a href="/upload-notes" class="card glass">
-        <h3>Upload PDF Notes</h3>
-        <p>Auto-generate summaries and exam questions directly from your PDF documents.</p>
-    </a>
+        <a href="/question-generator" class="card glass">
+            <h3>AI Question Generator</h3>
+            <p>Create exam-oriented questions automatically.</p>
+        </a>
 
-    <a href="/summarizer" class="card glass">
-        <h3>Smart Summarizer</h3>
-        <p>Turn long notes into short, exam-ready summaries instantly.</p>
-    </a>
+        <a href="/qa" class="card glass">
+            <h3>Question Answering</h3>
+            <p>Ask questions from any content and get precise answers.</p>
+        </a>
 
-    <a href="/question-generator" class="card glass">
-        <h3>AI Question Generator</h3>
-        <p>Create exam-oriented questions automatically.</p>
-    </a>
+        <a href="/study-plan" class="card glass">
+            <h3>Personalized Study Plan</h3>
+            <p>Create a smart, time-based study schedule using AI.</p>
+        </a>
 
-    <a href="/qa" class="card glass">
-        <h3>Question Answering</h3>
-        <p>Ask questions from any content and get precise answers.</p>
-    </a>
+    </section>
 
-    <a href="/study-plan" class="card glass">
-        <h3>Personalized Study Plan</h3>
-        <p>Create a smart, time-based study schedule using AI.</p>
-    </a>
+    <!-- CTA -->
+    <section class="cta">
+        <h2>Study Smarter. Not Harder.</h2>
+        <p>Let AI handle the heavy work while you focus on learning.</p>
+    </section>
 
-</section>
+    <!-- FOOTER -->
+    </footer>
 
-<!-- CTA -->
-<section class="cta">
-    <h2>Study Smarter. Not Harder.</h2>
-    <p>Let AI handle the heavy work while you focus on learning.</p>
-</section>
-
-<!-- FOOTER -->
-<footer>
-    © 2026 FocusVault • Built for Students
-</footer>
+    <script src="{{ url_for('static', filename='js/ui_effects.js') }}"></script>
 
 </body>
+
 </html>

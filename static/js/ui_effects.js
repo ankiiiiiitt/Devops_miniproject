@@ -4,25 +4,49 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. HERO TILT (Home Page)
+    // 1. HERO TILT (UPGRADED 3D VERSION)
     const heroHeading = document.getElementById('heroHeading');
     const heroText = document.querySelector('.hero-3d-text');
 
     if (heroHeading && heroText) {
+
+        let currentX = 0;
+        let currentY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
         heroHeading.addEventListener('mousemove', (e) => {
             const rect = heroHeading.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
+
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
-            const rotateX = ((y - centerY) / centerY) * -15;
-            const rotateY = ((x - centerX) / centerX) * 15;
-            heroText.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+            targetX = ((y - centerY) / centerY) * -15;
+            targetY = ((x - centerX) / centerX) * 15;
         });
 
         heroHeading.addEventListener('mouseleave', () => {
-            heroText.style.transform = `rotateX(0deg) rotateY(0deg)`;
+            targetX = 0;
+            targetY = 0;
         });
+
+        function animate3D() {
+            // smooth interpolation (VERY IMPORTANT 🔥)
+            currentX += (targetX - currentX) * 0.1;
+            currentY += (targetY - currentY) * 0.1;
+
+            heroText.style.transform = `
+            rotateX(${currentX}deg)
+            rotateY(${currentY}deg)
+            translateZ(40px)
+        `;
+
+            requestAnimationFrame(animate3D);
+        }
+
+        animate3D();
     }
 
     // 2. CHAT DESK TILT (Chat Page)
@@ -82,5 +106,17 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             "retina_detect": true
         });
+    }
+});
+
+// LIGHT PARALLAX EFFECT
+document.addEventListener('mousemove', (e) => {
+    const glow = document.querySelector('.bg-glow.blue');
+
+    if (glow) {
+        const x = (e.clientX / window.innerWidth) * 30;
+        const y = (e.clientY / window.innerHeight) * 30;
+
+        glow.style.transform = `translate(${x}px, ${y}px)`;
     }
 });
