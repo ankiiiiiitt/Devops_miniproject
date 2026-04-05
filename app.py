@@ -633,39 +633,40 @@ def study_plan():
 
         ai_response = ask_ai(
             f"""
-Create a structured daily study plan.
+Create a professional daily study plan.
 
-Syllabus:
-{syllabus}
+Syllabus: {syllabus}
+Topics: {topics}
+Timeline: {start_date} to {deadline}
 
-Topics:
-{topics}
-
-Start Date:
-{start_date}
-
-Deadline:
-{deadline}
-
-FORMATTING RULES:
-1. Provide a detailed, human-readable plan in Markdown format.
-2. At the very end of your response, provide a concise comma-separated list of the 5-10 most important study milestones/chapters from this plan, exactly in this format:
-   ###M_TOPICS### Milestone 1, Milestone 2, Milestone 3 ###END###
+STRICT INSTRUCTIONS:
+1. Output the plan in clean Markdown (no raw HTML).
+2. You MUST include a secret tracking section at the bottom.
+3. The tracking section must contain ONLY a comma-separated list of the 5-10 main topics, wrapped exactly like this:
+   ###M_TOPICS### Topic A, Topic B, Topic C ###END###
 """
         )
 
         import re
         milestones = []
-        match = re.search(r"###M_TOPICS###(.*?)###END###", ai_response, re.DOTALL)
+        # Look for milestones with a more flexible regex
+        match = re.search(r"###M_TOPICS###(.*?)(?:###END###|$)", ai_response, re.DOTALL | re.IGNORECASE)
+        
         if match:
-            milestones = [t.strip() for t in match.group(1).split(",") if t.strip()]
+            content = match.group(1).strip()
+            # Remove any unwanted HTML if it slipped in
+            content = re.sub(r'<[^>]*>', '', content)
+            milestones = [t.strip() for t in content.split(",") if t.strip()]
             display_plan = ai_response.replace(match.group(0), "").strip()
         else:
+            # Fallback: try to extract bullet points as milestones if delimiter failed
+            fallback_matches = re.findall(r"^\s*[\-\*]\s*(.*)$", ai_response, re.MULTILINE)
+            milestones = [m.strip() for m in fallback_matches if len(m.strip()) < 50][:10]
             display_plan = ai_response
 
-        # Default subject name from syllabus/topics
-        hint = (syllabus or topics or "Study Plan").split()[:3]
-        subject_name = " ".join(hint).title()
+        # Use the first 3 words for the subject
+        hint = (syllabus or topics or "Study Plan").strip()
+        subject_name = " ".join(hint.split()[:4]).title() or "My Study Plan"
 
         return render_template("study_plan_result.html", 
                                plan=display_plan, 

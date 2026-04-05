@@ -135,7 +135,7 @@
     <p class="sub">A personalized schedule designed to help you stay consistent</p>
 
     <div class="plan-area">
-        {{ plan }}
+        {{ plan | safe }}
     </div>
 
     <div class="actions">
@@ -164,6 +164,7 @@
         subject: "{{ subject }}",
         topics: {{ milestones | tojson | safe }}
     };
+    console.log("Study Planner Sync Data:", syncData);
 
     async function syncToProgress() {
         if (!syncData.topics || syncData.topics.length === 0) {
