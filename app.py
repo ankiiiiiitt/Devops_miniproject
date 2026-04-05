@@ -152,19 +152,44 @@ def update_bookmark(bookmark_id):
     data = request.json
     title = data.get("title")
     content = data.get("content")
+    personal_notes = data.get("personal_notes", "")
     
     if not content:
         return {"error": "Content is required"}, 400
         
     from bson.objectid import ObjectId
+    import datetime
     try:
         bookmarks_col.update_one(
             {"_id": ObjectId(bookmark_id), "user_email": session.get("user_email")},
-            {"$set": {"title": title, "content": content}}
+            {"$set": {
+                "title": title, 
+                "content": content,
+                "personal_notes": personal_notes,
+                "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+            }}
         )
         return {"status": "success", "message": "Bookmark updated!"}
     except:
         return {"error": "Failed to update bookmark"}, 500
+
+@app.route("/api/bookmarks/summarize/<bookmark_id>", methods=["POST"])
+def summarize_bookmark_api(bookmark_id):
+    if "user" not in session:
+        return {"error": "Unauthorized"}, 401
+        
+    from bson.objectid import ObjectId
+    bookmark = bookmarks_col.find_one({"_id": ObjectId(bookmark_id), "user_email": session.get("user_email")})
+    
+    if not bookmark:
+        return {"error": "Bookmark not found"}, 404
+        
+    content = bookmark.get("content", "")
+    if not content:
+        return {"error": "No content to summarize"}, 400
+        
+    summary = ask_ai(f"Summarize this study material in 3-5 concise bullet points:\n{content}")
+    return {"summary": summary}
 
 # ================= CHAT =================
 @app.route("/chat")
