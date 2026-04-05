@@ -60,8 +60,8 @@ def format_ai_response(text):
     
     return bleach.clean(html, tags=allowed_tags, attributes=allowed_attrs)
 
-# ================= GROQ =================
-def ask_ai(prompt):
+# ================= GROQ ================= 
+def ask_ai(prompt, format_output=True):
     cached = cache_col.find_one({"prompt": prompt})
     if cached:
         return cached["response"]
@@ -72,14 +72,18 @@ def ask_ai(prompt):
             model="llama-3.3-70b-versatile"
         )
         text = response.choices[0].message.content.strip()
-        formatted_text = format_ai_response(text)
+        
+        if format_output:
+            output = format_ai_response(text)
+        else:
+            output = text
 
     except Exception as e:
         print("GROQ ERROR:", e)
         return "AI service temporarily unavailable."
 
-    cache_col.insert_one({"prompt": prompt, "response": formatted_text})
-    return formatted_text
+    cache_col.insert_one({"prompt": prompt, "response": output})
+    return output
 
 # ================= CONTEXT PROCESSOR =================
 @app.context_processor
@@ -578,10 +582,23 @@ def question_generator():
         paragraph = request.form.get("paragraph")
 
         questions = ask_ai(
-            f"Generate 5 exam questions in numbered format:\n{paragraph}"
+            f"Generate exactly 5 exam questions based on this text. Return ONLY the questions, one per line. No introduction, no numbers, no markdown, no HTML tags:\n{paragraph}",
+            format_output=False
         )
 
-        questions_list = [q.strip() for q in questions.split("\n") if q.strip()]
+        # Split and clean, removing any accidental numbering like '1.' or 'Q1:'
+        import re
+        questions_list = []
+        for line in questions.split("\n"):
+            line = line.strip()
+            if line:
+                # Remove leading numbers/bullets like '1. ', '1) ', '- ', 'Q1: '
+                clean_line = re.sub(r'^(\d+[\.\)]|[\-\*]|Q\d+:)\s*', '', line)
+                if clean_line:
+                    questions_list.append(clean_line)
+        
+        # Limit to 5 if AI was chatty
+        questions_list = questions_list[:5]
 
         return render_template(
             "question_generator_result.html",
