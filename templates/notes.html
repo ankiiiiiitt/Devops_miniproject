@@ -27,16 +27,16 @@
                  data-id="{{ note._id }}" 
                  data-title="{{ note.title }}" 
                  data-content="{{ note.content }}"
-                 data-tags='{{ note.tags|tojson }}'
+                 data-tags='{{ (note.tags or [])|tojson }}'
                  onclick="openNoteEditor('{{ note._id }}')">
                 
                 <div class="note-card-header">
                     <h3 class="note-title">{{ note.title }}</h3>
                     <div class="note-tags">
-                        {% if 'important' in note.tags %}
+                        {% if note.tags and 'important' in note.tags %}
                             <span class="tag important">🔥 Important</span>
                         {% endif %}
-                        {% if 'pinned' in note.tags %}
+                        {% if note.tags and 'pinned' in note.tags %}
                             <span class="tag pinned">📌 Pinned</span>
                         {% endif %}
                     </div>

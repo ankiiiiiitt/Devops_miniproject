@@ -87,9 +87,17 @@ def notes():
         return redirect(url_for("notes"))
         
     user_notes = list(notes_col.find({"user_email": session.get("user_email")}).sort("updated_at", -1))
-    # Convert ObjectId to string for frontend JS
+    
+    import datetime
+    now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+    # Convert ObjectId and handle missing fields for older notes
     for n in user_notes:
         n["_id"] = str(n["_id"])
+        if "tags" not in n: n["tags"] = []
+        if "created_at" not in n: n["created_at"] = n.get("updated_at", now_iso)
+        if "updated_at" not in n: n["updated_at"] = n.get("created_at", now_iso)
+
     return render_template("notes.html", notes=user_notes)
 
 @app.route("/notes/delete/<note_id>", methods=["POST"])
