@@ -1040,3 +1040,77 @@ footer {
 .modal-overlay::-webkit-scrollbar-thumb:hover {
   background: rgba(56, 189, 248, 0.4);
 }
+/* ================= HERO 3D TEXT ================= */
+.hero-heading-wrapper {
+  perspective: 1200px;
+  margin-bottom: 25px;
+  display: inline-block;
+}
+
+.hero-3d-text {
+  font-size: 56px;
+  line-height: 1.1;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.2s ease-out;
+  transform-style: preserve-3d;
+}
+
+.hero-3d-text .line {
+  display: block;
+  transform-style: preserve-3d;
+}
+
+.hero-3d-text .word {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateY(40px) rotateX(-45deg) translateZ(-50px);
+  animation: heroEntrance 1.2s cubic-bezier(0.2, 1, 0.3, 1) forwards,
+             heroFloat 4s ease-in-out infinite alternate;
+}
+
+.hero-3d-text .line.gradient .word {
+  background: linear-gradient(135deg, #38bdf8, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+}
+
+/* Staggered Animations */
+.hero-3d-text .line:nth-child(1) .word:nth-child(1) { animation-delay: 0.1s, 1.3s; }
+.hero-3d-text .line:nth-child(1) .word:nth-child(2) { animation-delay: 0.3s, 1.5s; }
+.hero-3d-text .line:nth-child(2) .word:nth-child(1) { animation-delay: 0.6s, 1.8s; }
+.hero-3d-text .line:nth-child(2) .word:nth-child(2) { animation-delay: 0.8s, 2s; }
+
+@keyframes heroEntrance {
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) rotateX(0) translateZ(0);
+  }
+}
+
+@keyframes heroFloat {
+  from { transform: translateY(0); }
+  to { transform: translateY(-12px); }
+}
+
+/* Hero paragraph entrance */
+.hero-text p {
+  opacity: 0;
+  animation: fadeIn 1s ease-out 1.2s forwards;
+}
+
+.hero-actions {
+  opacity: 0;
+  animation: fadeIn 1s ease-out 1.5s forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}

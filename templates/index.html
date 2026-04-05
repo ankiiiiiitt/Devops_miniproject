@@ -6,9 +6,7 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script>
-
-    </script>
+    <script src="{{ url_for('static', filename='js/ui_effects.js') }}"></script>
 </head>
 <body>
 
@@ -40,10 +38,18 @@
 <section class="hero">
 
     <div class="hero-text">
-        <h1>
-            Focus Better.<br>
-            <span class="gradient-text">Learn Smarter.</span>
-        </h1>
+        <div class="hero-heading-wrapper" id="heroHeading">
+            <h1 class="hero-3d-text">
+                <span class="line">
+                    <span class="word">Focus</span>
+                    <span class="word">Better.</span>
+                </span>
+                <span class="line gradient">
+                    <span class="word">Learn</span>
+                    <span class="word">Smarter.</span>
+                </span>
+            </h1>
+        </div>
 
         <p>
             Your AI-powered study assistant that helps you summarize,
