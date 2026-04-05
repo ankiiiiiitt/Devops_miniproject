@@ -8,7 +8,7 @@
             {% for msg in messages %}
                 {% if msg.role != 'system' %}
                 <div class="chat-message {{ 'user' if msg.role == 'user' else 'ai' }}">
-                    <div class="bubble-content">{{ msg.content }}</div>
+                    <div class="bubble-content">{{ msg.content | safe if msg.role == 'assistant' else msg.content }}</div>
                     {% if msg.role == 'assistant' %}
                     <div class="chat-message-actions">
                         <button class="btn-bookmark" 
@@ -100,21 +100,23 @@
                 body: JSON.stringify(payload)
             });
 
-            const data = await response.json();
-            thinkingDiv.remove();
-
-            if (data.error) {
-                appendMessage('Sorry, an error occurred: ' + data.error, 'ai');
-            } else {
-                typeMessage(data.reply, 'ai');
-                
-                if (!currentChatId && data.chat_id) {
-                    currentChatId = data.chat_id;
-                    window.history.pushState({}, '', '/chat/' + currentChatId);
-                    if(typeof loadChatHistory === 'function') loadChatHistory();
+            if (response.ok) {
+                const data = await response.json();
+                if (data.reply) {
+                    if (!currentChatId && data.chat_id) {
+                        currentChatId = data.chat_id;
+                        window.history.pushState({}, '', '/chat/' + currentChatId);
+                    }
+                    thinkingDiv.remove();
+                    appendMessage(data.reply, 'ai');
+                } else {
+                    thinkingDiv.remove();
+                    appendMessage('Sorry, something went wrong.', 'ai');
                 }
+            } else {
+                thinkingDiv.remove();
+                appendMessage('Failed to connect to AI server.', 'ai');
             }
-
         } catch (err) {
             thinkingDiv.remove();
             appendMessage('Failed to connect to AI server.', 'ai');
@@ -128,7 +130,11 @@
         
         const content = document.createElement('div');
         content.className = 'bubble-content';
-        content.textContent = text;
+        if (sender === 'ai') {
+            content.innerHTML = text;
+        } else {
+            content.textContent = text;
+        }
         div.appendChild(content);
         
         if (sender === 'ai' && !id) {

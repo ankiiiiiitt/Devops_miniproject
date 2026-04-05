@@ -249,6 +249,90 @@ a {
   text-shadow: 0 0 10px rgba(244, 63, 94, 0.4);
 }
 
+/* =============================================================
+   MARKDOWN CONTENT STYLING (AI RESPONSES)
+   ============================================================= */
+.bubble-content table, 
+.note-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 15px 0;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-glass);
+}
+
+.bubble-content th, 
+.note-preview th {
+  background: rgba(56, 189, 248, 0.1);
+  color: var(--primary);
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 700;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.bubble-content td, 
+.note-preview td {
+  padding: 10px 15px;
+  color: #cbd5e1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* CODE BLOCKS */
+.bubble-content pre, 
+.note-preview pre {
+  background: #020617;
+  padding: 20px;
+  border-radius: 16px;
+  margin: 15px 0;
+  overflow-x: auto;
+  border: 1px solid var(--border-glass);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.bubble-content code, 
+.note-preview code {
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  color: var(--primary);
+}
+
+/* LISTS & BLOCKQUOTES */
+.bubble-content ul, 
+.bubble-content ol,
+.note-preview ul, 
+.note-preview ol {
+  margin: 10px 0 10px 25px;
+}
+
+.bubble-content li,
+.note-preview li {
+  margin-bottom: 8px;
+  color: #cbd5e1;
+}
+
+.bubble-content blockquote,
+.note-preview blockquote {
+  border-left: 4px solid var(--primary);
+  background: rgba(56, 189, 248, 0.05);
+  padding: 15px 25px;
+  margin: 15px 0;
+  border-radius: 0 12px 12px 0;
+  font-style: italic;
+  color: #94a3b8;
+}
+
+/* Fix Line-Clamp Lint */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* ================= MAIN CONTENT ================= */
 .main-content {
   flex: 1;

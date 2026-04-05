@@ -2,6 +2,8 @@ import os
 import datetime
 import random
 import PyPDF2
+import markdown
+import bleach
 from flask import Flask, render_template, request, session, redirect, url_for, flash
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -37,6 +39,26 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', 'your-app-password')
 
 mail = Mail(app)
 
+# ================= UTILS =================
+def format_ai_response(text):
+    """Converts AI raw text to sanitized HTML markdown."""
+    html = markdown.markdown(text, extensions=["fenced_code", "tables", "nl2br"])
+    
+    # Configure allowed tags and attributes for sanitization
+    allowed_tags = [
+        'p', 'br', 'strong', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'code', 'pre', 'ul', 'ol', 'li', 'table', 'thead', 'tbody', 
+        'tr', 'th', 'td', 'blockquote', 'hr'
+    ]
+    allowed_attrs = {
+        'code': ['class'],
+        'pre': ['class'],
+        'td': ['align'],
+        'th': ['align']
+    }
+    
+    return bleach.clean(html, tags=allowed_tags, attributes=allowed_attrs)
+
 # ================= GROQ =================
 def ask_ai(prompt):
     cached = cache_col.find_one({"prompt": prompt})
@@ -49,13 +71,14 @@ def ask_ai(prompt):
             model="llama-3.3-70b-versatile"
         )
         text = response.choices[0].message.content.strip()
+        formatted_text = format_ai_response(text)
 
     except Exception as e:
         print("GROQ ERROR:", e)
         return "AI service temporarily unavailable."
 
-    cache_col.insert_one({"prompt": prompt, "response": text})
-    return text
+    cache_col.insert_one({"prompt": prompt, "response": formatted_text})
+    return formatted_text
 
 
 # ================= ROUTES =================
@@ -355,8 +378,9 @@ def chat_api():
             model="llama-3.3-70b-versatile"
         )
         reply = response.choices[0].message.content.strip()
+        formatted_reply = format_ai_response(reply)
         
-        new_ai_msg = {"role": "assistant", "content": reply}
+        new_ai_msg = {"role": "assistant", "content": formatted_reply}
         chat_doc["messages"].append(new_ai_msg)
         
         chats_col.update_one(
@@ -367,7 +391,7 @@ def chat_api():
             }}
         )
         
-        return {"reply": reply, "chat_id": chat_id}
+        return {"reply": formatted_reply, "chat_id": chat_id}
 
     except Exception as e:
         print("GROQ CHAT ERROR:", e)
