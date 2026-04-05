@@ -6,17 +6,18 @@
     <title>FocusVault Workspace</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script>
-
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="{{ url_for('static', filename='js/ui_effects.js') }}"></script>
     {% block styles %}{% endblock %}
 </head>
 <body>
 
-<!-- BACKGROUND BLUR -->
-<div class="bg-glow blue"></div>
-<div class="bg-glow purple"></div>
+<!-- FUTURISTIC BACKGROUND LAYERS -->
+<div id="particles-js"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 
 <div class="dashboard-layout">
     <!-- SIDEBAR -->
