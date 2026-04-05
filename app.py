@@ -633,50 +633,55 @@ def study_plan():
 
         ai_response = ask_ai(
             f"""
-Create a professional daily study plan.
+            Create a highly structured daily study plan.
+            Syllabus: {syllabus}
+            Topics: {topics}
+            Period: {start_date} to {deadline}
 
-Syllabus: {syllabus}
-Topics: {topics}
-Timeline: {start_date} to {deadline}
-
-STRICT INSTRUCTIONS:
-1. Output the plan in clean Markdown (no raw HTML).
-2. You MUST include a secret tracking section at the bottom.
-3. The tracking section must contain ONLY a comma-separated list of the 5-10 main topics, wrapped exactly like this:
-   ###M_TOPICS### Topic A, Topic B, Topic C ###END###
-"""
+            **MANDATORY FORMATTING**:
+            - Use #, ## for clear headings.
+            - Use - for daily tasks.
+            - END the response with: ###M_TOPICS### [Topic 1], [Topic 2]... ###END###
+            """
         )
 
         import re
+        # 1. PRIMARY EXTRACTION (Delimiter)
         milestones = []
-        # Look for milestones with a more flexible regex
         match = re.search(r"###M_TOPICS###(.*?)(?:###END###|$)", ai_response, re.DOTALL | re.IGNORECASE)
         
         if match:
-            content = match.group(1).strip()
-            content = re.sub(r'<[^>]*>', '', content)
-            milestones = [t.strip() for t in content.split(",") if t.strip()]
+            raw_t = match.group(1).strip()
+            milestones = [t.strip(' []') for t in raw_t.split(",") if t.strip()]
             display_plan = ai_response.replace(match.group(0), "").strip()
         else:
-            fallback_matches = re.findall(r"^\s*[\-\*]\s*(.*)$", ai_response, re.MULTILINE)
-            milestones = [m.strip() for m in fallback_matches if len(m.strip()) < 50][:10]
+            # 2. FALLBACK A (Headings)
+            headings = re.findall(r"^#+\s+(.*)$", ai_response, re.MULTILINE)
+            if headings:
+                milestones = [h.strip() for h in headings if len(h.strip()) < 50][:8]
+            
+            # 3. FALLBACK B (Bullets if no headings)
+            if not milestones:
+                bullets = re.findall(r"^\s*[\-\*]\s*(.*)$", ai_response, re.MULTILINE)
+                milestones = [b.strip() for b in bullets if len(b.strip()) < 50][:10]
+            
+            # 4. FINAL FALLBACK (Phases)
+            if not milestones:
+                milestones = ["Phase 1: Foundations", "Phase 2: Deep Dive", "Phase 3: Practice", "Phase 4: Final Review"]
+            
             display_plan = ai_response
 
-        # --- Simple Markdown to HTML Converter ---
-        # 1. Convert headers
-        display_plan = re.sub(r'^### (.*)$', r'<h3>\1</h3>', display_plan, flags=re.MULTILINE)
-        display_plan = re.sub(r'^## (.*)$', r'<h2>\1</h2>', display_plan, flags=re.MULTILINE)
-        display_plan = re.sub(r'^# (.*)$', r'<h1>\1</h1>', display_plan, flags=re.MULTILINE)
-        # 2. Convert Bold
+        # --- Enhanced Markdown Converter ---
+        # Bold
         display_plan = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', display_plan)
-        # 3. Convert Lists
-        display_plan = re.sub(r'^\s*[\-\*]\s*(.*)$', r'<li>\1</li>', display_plan, flags=re.MULTILINE)
-        # 4. Wrap lists in <ul> (simple approach)
-        display_plan = display_plan.replace('<li>', '<ul><li>', 1).replace('</li>\n', '</li></ul>\n')
-        # 5. Convert Newlines to <br> for standard text
+        # Headings
+        display_plan = re.sub(r'^### (.*)$', r'<h3 style="color:#f8fafc;margin-top:25px;">\1</h3>', display_plan, flags=re.MULTILINE)
+        display_plan = re.sub(r'^## (.*)$', r'<h2 style="color:var(--primary);margin-top:30px;font-size:24px;">\1</h2>', display_plan, flags=re.MULTILINE)
+        display_plan = re.sub(r'^# (.*)$', r'<h1 style="color:var(--primary);font-size:28px;">\1</h1>', display_plan, flags=re.MULTILINE)
+        # Newlines
         display_plan = display_plan.replace("\n", "<br>")
 
-        # Use the first 3 words for the subject
+        # Clean subject name
         hint = (syllabus or topics or "Study Plan").strip()
         subject_name = " ".join(hint.split()[:4]).title() or "My Study Plan"
 
