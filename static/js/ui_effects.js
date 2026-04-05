@@ -49,21 +49,38 @@ document.addEventListener('DOMContentLoaded', () => {
         animate3D();
     }
 
-    // 2. CHAT DESK TILT (Chat Page)
-    const chatDesk = document.getElementById('chatDesk');
-    if (chatDesk) {
-        document.addEventListener('mousemove', (e) => {
-            const x = e.clientX;
-            const y = e.clientY;
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
+    // 2. CHAT CONTAINER TILT (Modern Bubble Version)
+    const chatContainer = document.querySelector('.chat-container');
 
-            // Subtle rotation for the whole desk (max 5 degrees)
-            const rotateX = ((y - centerY) / centerY) * -5;
-            const rotateY = ((x - centerX) / centerX) * 5;
+    if (chatContainer) {
+        let cX = 0, cY = 0, tX = 0, tY = 0;
 
-            chatDesk.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        chatContainer.addEventListener('mousemove', (e) => {
+            const rect = chatContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            tX = ((y - centerY) / centerY) * -5; // Subtler tilt for chat
+            tY = ((x - centerX) / centerX) * 5;
         });
+
+        chatContainer.addEventListener('mouseleave', () => {
+            tX = 0;
+            tY = 0;
+        });
+
+        function animateChat3D() {
+            cX += (tX - cX) * 0.1;
+            cY += (tY - cY) * 0.1;
+
+            chatContainer.style.transform = `rotateX(${cX}deg) rotateY(${cY}deg)`;
+            requestAnimationFrame(animateChat3D);
+        }
+
+        animateChat3D();
     }
 
     // 3. PARTICLES INITIALIZATION

@@ -1,13 +1,14 @@
 {% extends "dashboard_base.html" %}
 
 {% block content %}
-<div class="chat-container" id="chatDesk">
+<div class="chat-container">
+    <!-- MESSAGING AREA -->
     <div class="chat-history" id="chatHistory">
         {% if messages %}
             {% for msg in messages %}
                 {% if msg.role != 'system' %}
                 <div class="chat-message {{ 'user' if msg.role == 'user' else 'ai' }}">
-                    {{ msg.content }}
+                    <div class="bubble-content">{{ msg.content }}</div>
                     {% if msg.role == 'assistant' %}
                     <div class="chat-message-actions">
                         <button class="btn-bookmark" 
@@ -23,7 +24,9 @@
             {% endfor %}
         {% else %}
         <div class="chat-message ai" id="welcomeMessage">
-            Hello {{ session.get('user', 'there') }}! I'm your AI study assistant. How can I help you focus and learn today?
+            <div class="bubble-content">
+                Hello {{ session.get('user', 'there') }}! I'm your AI study assistant. How can I help you focus and learn today?
+            </div>
             <div class="chat-message-actions">
                 <button class="btn-bookmark" 
                     data-content="Hello {{ session.get('user', 'there') }}! I'm your AI study assistant. How can I help you focus and learn today?" 
@@ -36,12 +39,13 @@
         {% endif %}
     </div>
 
+    <!-- STICKY PILL INPUT -->
     <div class="chat-input-wrapper">
         <div class="chat-input-box">
-            <textarea id="chatInput" placeholder="Type your message to FocusVault AI..." rows="1" 
+            <textarea id="chatInput" placeholder="Ask FocusVault AI anything..." rows="1" 
                 oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
-            <button id="sendBtn" onclick="sendMessage()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button id="sendBtn" onclick="sendMessage()" title="Send Message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="22" y1="2" x2="11" y2="13"></line>
                     <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
@@ -121,29 +125,37 @@
         const div = document.createElement('div');
         div.className = `chat-message ${sender}`;
         if (id) div.id = id;
-        div.textContent = text;
+        
+        const content = document.createElement('div');
+        content.className = 'bubble-content';
+        content.textContent = text;
+        div.appendChild(content);
         
         if (sender === 'ai' && !id) {
             addMessageActions(div, text);
         }
         
         chatHistory.appendChild(div);
-        chatHistory.scrollTop = chatHistory.scrollHeight;
+        scrollToBottom();
     }
 
     function typeMessage(text, sender) {
         const div = document.createElement('div');
         div.className = `chat-message ${sender}`;
+        
+        const content = document.createElement('div');
+        content.className = 'bubble-content';
+        div.appendChild(content);
         chatHistory.appendChild(div);
         
         let index = 0;
-        const speed = 15; // ms per char
+        const speed = 15;
 
         function type() {
             if (index < text.length) {
-                div.textContent += text.charAt(index);
+                content.textContent += text.charAt(index);
                 index++;
-                chatHistory.scrollTop = chatHistory.scrollHeight;
+                scrollToBottom();
                 setTimeout(type, speed);
             } else {
                 addMessageActions(div, text);
@@ -162,10 +174,17 @@
         bMark.setAttribute('data-content', text);
         bMark.setAttribute('data-type', 'AI Chat Response');
         bMark.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>`;
-        bMark.onclick = () => handleBookmarkClick(bMark);
+        bMark.onclick = (e) => { e.stopPropagation(); handleBookmarkClick(bMark); };
         
         actions.appendChild(bMark);
         div.appendChild(actions);
+    }
+
+    function scrollToBottom() {
+        chatHistory.scrollTo({
+            top: chatHistory.scrollHeight,
+            behavior: 'smooth'
+        });
     }
 
     window.addEventListener('DOMContentLoaded', () => {
