@@ -124,6 +124,31 @@ document.addEventListener('DOMContentLoaded', () => {
             "retina_detect": true
         });
     }
+
+    // 4. SCOPED DASHBOARD SIDEBAR TILT (Floating Blade)
+    const dashboardSidebar = document.querySelector('.dashboard-page .sidebar');
+    if (dashboardSidebar) {
+        let sdx = 0, sdy = 0, stx = 0, sty = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            if (e.clientX < 400) { // Only tilt when mouse is near sidebar
+                const centerX = 150;
+                const centerY = window.innerHeight / 2;
+                stx = ((e.clientY - centerY) / centerY) * -8;
+                sty = ((e.clientX - centerX) / centerX) * 8;
+            } else {
+                stx = 0; sty = 0;
+            }
+        });
+
+        function animateSidebar() {
+            sdx += (stx - sdx) * 0.08;
+            sdy += (sty - sdy) * 0.08;
+            dashboardSidebar.style.transform = `rotateX(${sdx}deg) rotateY(${sdy}deg)`;
+            requestAnimationFrame(animateSidebar);
+        }
+        animateSidebar();
+    }
 });
 
 // LIGHT PARALLAX EFFECT
