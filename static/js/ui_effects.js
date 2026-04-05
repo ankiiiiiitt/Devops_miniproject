@@ -83,8 +83,53 @@ document.addEventListener('DOMContentLoaded', () => {
         animateChat3D();
     }
 
-    // 3. PARTICLES INITIALIZATION
-    if (document.getElementById('particles-js')) {
+    // 4. HOME HUB TILT (Dashboard Home)
+    const homeHub = document.getElementById('homeHub');
+    if (homeHub) {
+        let hX = 0, hY = 0, htX = 0, htY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            htX = ((y - centerY) / centerY) * -3; // Very subtle scene tilt
+            htY = ((x - centerX) / centerX) * 3;
+        });
+
+        function animateHome3D() {
+            hX += (htX - hX) * 0.05;
+            hY += (htY - hY) * 0.05;
+            homeHub.style.transform = `rotateX(${hX}deg) rotateY(${hY}deg)`;
+            requestAnimationFrame(animateHome3D);
+        }
+        animateHome3D();
+    }
+
+    // 5. HUB CARDS TILT (Features Grid)
+    const hubCards = document.querySelectorAll('.hub-card');
+    hubCards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = ((y - centerY) / centerY) * -15; // Aggressive card tilt
+            const rotateY = ((x - centerX) / centerX) * 15;
+
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+        });
+    });
+
+    // 6. PARTICLES INITIALIZATION
+    if (typeof particlesJS !== 'undefined' && document.getElementById('particles-js')) {
         particlesJS('particles-js', {
             "particles": {
                 "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
@@ -92,34 +137,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 "shape": { "type": "circle" },
                 "opacity": { "value": 0.2, "random": false },
                 "size": { "value": 3, "random": true },
-                "line_linked": {
-                    "enable": true,
-                    "distance": 150,
-                    "color": "#38bdf8",
-                    "opacity": 0.1,
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 1.5,
-                    "direction": "none",
-                    "random": false,
-                    "straight": false,
-                    "out_mode": "out",
-                    "bounce": false
-                }
+                "line_linked": { "enable": true, "distance": 150, "color": "#38bdf8", "opacity": 0.1, "width": 1 },
+                "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
             },
             "interactivity": {
                 "detect_on": "canvas",
-                "events": {
-                    "onhover": { "enable": true, "mode": "grab" },
-                    "onclick": { "enable": true, "mode": "push" },
-                    "resize": true
-                },
-                "modes": {
-                    "grab": { "distance": 140, "line_linked": { "opacity": 0.5 } },
-                    "push": { "particles_nb": 4 }
-                }
+                "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } }, "push": { "particles_nb": 4 } }
             },
             "retina_detect": true
         });

@@ -267,32 +267,6 @@ a {
   border: 1px solid var(--border-glass);
   color: white;
   padding: 10px;
-  border-radius: 10px;
-  cursor: pointer;
-  display: none;
-}
-
-/* ================= GLOBAL NAVBAR (FOR HOME) ================= */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 22px 70px;
-}
-
-.logo-box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.logo-box img {
-  width: 42px;
-  filter: brightness(0) invert(1) drop-shadow(0 0 10px var(--primary));
-}
-
-.logo-box span {
-  font-size: 26px;
   font-weight: 700;
   color: var(--primary);
 }
@@ -917,39 +891,144 @@ a {
   gap: 15px;
 }
 
-/* ================= RESPONSIVE ================= */
-@media (max-width: 900px) {
-  .sidebar {
-    position: fixed;
-    left: -320px;
-    margin: 0;
-    height: 100vh;
-    border-radius: 0;
-    top: 0;
-  }
+/* =============================================================
+   HOME DASHBOARD HUB - 3D SYSTEM
+   ============================================================= */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 120px 8% 80px;
+  perspective: 2000px;
+  transform-style: preserve-3d;
+}
 
-  .sidebar.active {
-    left: 0;
-  }
+.hero-text {
+  max-width: 650px;
+  transform-style: preserve-3d;
+  z-index: 10;
+}
 
-  .sidebar-toggle-btn {
-    display: block;
-  }
+.hero-3d-text {
+  font-size: 86px;
+  font-weight: 900;
+  line-height: 0.9;
+  margin-bottom: 30px;
+  transform-style: preserve-3d;
+  color: #f8fafc;
+}
 
-  .main-content {
-    padding: 80px 20px;
-  }
+.hero-3d-text .line { display: block; margin-bottom: 8px; }
+.hero-3d-text .gradient {
+  background: linear-gradient(135deg, var(--primary), #2563eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
-  .hero {
-    flex-direction: column;
-    text-align: center;
-    padding: 100px 20px;
-  }
+.hero-3d-text .word {
+  display: inline-block;
+  transform: translateZ(60px);
+  text-shadow: 
+    1px 1px 0px rgba(56, 189, 248, 0.4),
+    2px 2px 0px rgba(56, 189, 248, 0.3),
+    3px 3px 0px rgba(56, 189, 248, 0.2),
+    0 20px 40px rgba(0,0,0,0.4);
+}
 
-  .hero-video video {
-    width: 100%;
-    max-width: 400px;
-  }
+.hero-visual.glass {
+  background: rgba(15, 23, 42, 0.3);
+  backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 3D ACTION HUBS */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 35px;
+  padding: 40px 8% 120px;
+  perspective: 1500px;
+}
+
+.hub-card {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  padding: 45px 35px;
+  border-radius: 35px;
+  text-decoration: none;
+  transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+  display: flex;
+  flex-direction: column;
+}
+
+.hub-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.hub-card h3 {
+  font-size: 26px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 15px;
+  transform: translateZ(40px);
+}
+
+.hub-card p {
+  font-size: 15px;
+  color: #94a3b8;
+  line-height: 1.6;
+  transform: translateZ(25px);
+}
+
+.hub-icon {
+  font-size: 32px;
+  margin-bottom: 25px;
+  padding: 15px;
+  background: rgba(56, 189, 248, 0.1);
+  width: fit-content;
+  border-radius: 18px;
+  transform: translateZ(50px);
+}
+
+/* HUB NAV REFINEMENT */
+.navbar {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 1200px;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(30px);
+  border: 1px solid var(--border-glass);
+  border-radius: 100px;
+  padding: 15px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2000;
+}
+
+.nav-links {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  list-style: none;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #cbd5e1;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.nav-links a:hover {
+  color: var(--primary);
 }
 
 /* ================= HERO 3D TEXT ================= */

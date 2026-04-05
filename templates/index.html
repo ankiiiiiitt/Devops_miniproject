@@ -12,11 +12,12 @@
 
 <body>
 
-    <!-- BACKGROUND BLUR -->
+    <!-- PARTICLES & GLOW -->
+    <div id="particles-js"></div>
     <div class="bg-glow blue"></div>
     <div class="bg-glow purple"></div>
 
-    <!-- NAVBAR -->
+    <!-- FLOATING NAV -->
     <nav class="navbar">
         <div class="logo-box">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="FocusVault Logo">
@@ -25,81 +26,90 @@
 
         <ul class="nav-links">
             <li><a href="{{ url_for('home') }}">Home</a></li>
-
             {% if user %}
-            <li class="user-name">Hi, {{ user }}</li>
-            <li><a href="{{ url_for('chat') }}" style="color: #38bdf8; font-weight: 500;">Open Workspace 🚀</a></li>
-            <li><a href="{{ url_for('logout') }}" class="logout-btn">Logout</a></li>
+            <li class="user-name" style="color: #64748b; font-weight: 500;">{{ user }}</li>
+            <li><a href="{{ url_for('chat') }}" style="background: var(--primary); color: #020617; padding: 8px 20px; border-radius: 50px; font-weight: 700;">Open Hub 🚀</a></li>
             {% else %}
             <li><a href="{{ url_for('login') }}">Login</a></li>
+            <li><a href="{{ url_for('register') }}" style="background: var(--primary); color: #020617; padding: 8px 20px; border-radius: 50px; font-weight: 700;">Get Started</a></li>
             {% endif %}
         </ul>
     </nav>
 
-    <!-- HERO SECTION -->
-    <section class="hero">
-
+    <!-- 3D HERO HUB -->
+    <section class="hero" id="homeHub">
         <div class="hero-text">
-            <div class="hero-heading-wrapper" id="heroHeading">
-                <h1 class="hero-3d-text">
-                    <span class="line">
-                        <span class="word">Focus</span>
-                        <span class="word">Better.</span>
-                    </span>
-                    <span class="line gradient">
-                        <span class="word">Learn</span>
-                        <span class="word">Smarter.</span>
-                    </span>
-                </h1>
-            </div>
+            <h1 class="hero-3d-text">
+                <span class="line"><span class="word">Focus</span> <span class="word">Better.</span></span>
+                <span class="line gradient"><span class="word">Learn</span> <span class="word">Smarter.</span></span>
+            </h1>
 
             <p>
-                Your AI-powered study assistant that helps you summarize,
-                generate questions, and plan studies — faster and smarter.
+                Experience the next generation of AI-powered productivity. 
+                FocusVault orchestrates your study flow with intelligent 
+                summarization, document management, and real-time AI assistance.
             </p>
 
-            <div class="hero-actions">
-                <a href="#features" class="btn">Explore Features</a>
+            <div class="hero-actions" style="display: flex; gap: 20px;">
+                <a href="{{ url_for('chat') }}" class="btn-primary" style="background: var(--primary); color: #020617; padding: 15px 35px; border-radius: 15px; font-weight: 700; text-decoration: none; box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3);">
+                    Launch Workspace
+                </a>
+                <a href="#features" style="color: #cbd5e1; padding: 15px 35px; text-decoration: none; font-weight: 600;">
+                    Review Features ↓
+                </a>
             </div>
-
         </div>
 
-        <div class="hero-video">
-            <video autoplay muted loop playsinline>
-                <source src="{{ url_for('static', filename='videos/hero.mp4') }}" type="video/mp4">
-            </video>
+        <!-- MOCK ANALYTICS PANEL (Visual Only) -->
+        <div class="hero-visual glass" style="width: 450px; height: 320px; border-radius: 30px; display: flex; flex-direction: column; padding: 30px; transform: rotateY(-15deg); box-shadow: 0 30px 60px rgba(0,0,0,0.5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h4 style="margin: 0; color: #94a3b8; font-size: 14px; text-transform: uppercase;">Study Progress</h4>
+                <span style="color: var(--primary); font-size: 12px; font-weight: 700;">84% Efficiency</span>
+            </div>
+            <div style="flex: 1; display: flex; align-items: flex-end; gap: 10px; padding-bottom: 20px;">
+                <div style="flex: 1; background: rgba(56, 189, 248, 0.1); height: 40%; border-radius: 5px;"></div>
+                <div style="flex: 1; background: rgba(56, 189, 248, 0.3); height: 70%; border-radius: 5px;"></div>
+                <div style="flex: 1; background: var(--primary); height: 90%; border-radius: 5px; box-shadow: 0 0 15px var(--primary);"></div>
+                <div style="flex: 1; background: rgba(56, 189, 248, 0.2); height: 50%; border-radius: 5px;"></div>
+                <div style="flex: 1; background: rgba(56, 189, 248, 0.4); height: 80%; border-radius: 5px;"></div>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; font-size: 13px; color: #64748b;">
+                Next Milestone: AI Exam Prep (Today 2PM)
+            </div>
         </div>
-
     </section>
 
-    <!-- FEATURES -->
+    <!-- 3D INTERACTIVE MODULES -->
     <section class="features" id="features">
-
-        <a href="/upload-notes" class="card glass">
-            <h3>Upload PDF Notes</h3>
-            <p>Auto-generate summaries and exam questions directly from your PDF documents.</p>
+        <a href="{{ url_for('home') }}" class="hub-card">
+            <div class="hub-icon">📥</div>
+            <h3>PDF Document Lab</h3>
+            <p>Upload complex PDF notes and let AI extract exam-ready summaries and key questions automatically.</p>
         </a>
 
-        <a href="/summarizer" class="card glass">
-            <h3>Smart Summarizer</h3>
-            <p>Turn long notes into short, exam-ready summaries instantly.</p>
+        <a href="/summarizer" class="hub-card">
+            <div class="hub-icon">✨</div>
+            <h3>Intelligent Summarizer</h3>
+            <p>Condense thousands of words into precise, bulleted study guides in milliseconds with Llama-3.</p>
         </a>
 
-        <a href="/question-generator" class="card glass">
-            <h3>AI Question Generator</h3>
-            <p>Create exam-oriented questions automatically.</p>
+        <a href="/question-generator" class="hub-card">
+            <div class="hub-icon">🧠</div>
+            <h3>Exam Question Engine</h3>
+            <p>Generate high-probability exam questions and mock tests tailored to your unique study materials.</p>
         </a>
 
-        <a href="/qa" class="card glass">
-            <h3>Question Answering</h3>
-            <p>Ask questions from any content and get precise answers.</p>
+        <a href="/qa" class="hub-card">
+            <div class="hub-icon">💬</div>
+            <h3>Deep Context Q&A</h3>
+            <p>Interrogate your data. Ask anything about your notes and get accurate, source-backed answers.</p>
         </a>
 
-        <a href="/study-plan" class="card glass">
-            <h3>Personalized Study Plan</h3>
-            <p>Create a smart, time-based study schedule using AI.</p>
+        <a href="/study-plan" class="hub-card">
+            <div class="hub-icon">📅</div>
+            <h3>Dynamic Study Planner</h3>
+            <p>Design optimized study schedules that adapt to your pace, deadlines, and learning intensity.</p>
         </a>
-
     </section>
 
     <!-- CTA -->
