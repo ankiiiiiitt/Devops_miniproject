@@ -631,7 +631,7 @@ def study_plan():
         start_date = request.form.get("start_date")
         deadline = request.form.get("deadline")
 
-        plan = ask_ai(
+        ai_response = ask_ai(
             f"""
 Create a structured daily study plan.
 
@@ -647,12 +647,30 @@ Start Date:
 Deadline:
 {deadline}
 
-Format:
-Day-wise plan with topics and revision.
+FORMATTING RULES:
+1. Provide a detailed, human-readable plan in Markdown format.
+2. At the very end of your response, provide a concise comma-separated list of the 5-10 most important study milestones/chapters from this plan, exactly in this format:
+   ###M_TOPICS### Milestone 1, Milestone 2, Milestone 3 ###END###
 """
         )
 
-        return render_template("study_plan_result.html", plan=plan)
+        import re
+        milestones = []
+        match = re.search(r"###M_TOPICS###(.*?)###END###", ai_response, re.DOTALL)
+        if match:
+            milestones = [t.strip() for t in match.group(1).split(",") if t.strip()]
+            display_plan = ai_response.replace(match.group(0), "").strip()
+        else:
+            display_plan = ai_response
+
+        # Default subject name from syllabus/topics
+        hint = (syllabus or topics or "Study Plan").split()[:3]
+        subject_name = " ".join(hint).title()
+
+        return render_template("study_plan_result.html", 
+                               plan=display_plan, 
+                               milestones=milestones,
+                               subject=subject_name)
 
     return render_template("study_plan.html")
 
