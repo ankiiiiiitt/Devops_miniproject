@@ -189,7 +189,18 @@ def bookmarks():
     if "user" not in session:
         return redirect(url_for("login"))
     
-    user_bookmarks = list(bookmarks_col.find({"user_email": session.get("user_email")}).sort("created_at", -1))
+    # Sort by pinned (desc) then created_at (desc)
+    user_bookmarks = list(bookmarks_col.find({"user_email": session.get("user_email")}).sort([("pinned", -1), ("created_at", -1)]))
+    
+    import datetime
+    now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    
+    for b in user_bookmarks:
+        b["_id"] = str(b["_id"])
+        if "tags" not in b: b["tags"] = []
+        if "pinned" not in b: b["pinned"] = False
+        if "updated_at" not in b: b["updated_at"] = b.get("created_at", now_iso)
+
     return render_template("bookmarks.html", bookmarks=user_bookmarks)
 
 @app.route("/bookmarks/delete/<bookmark_id>", methods=["POST"])

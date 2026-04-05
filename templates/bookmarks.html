@@ -1,125 +1,103 @@
 {% extends "dashboard_base.html" %}
 
 {% block content %}
-<div class="tool-container-flex">
-    <div class="bookmarks-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
-            <h2 style="font-weight: 500; font-size: 32px; color: #38bdf8; margin: 0;">My Saved Bookmarks 🔖</h2>
-        </div>
-        
-        {% if bookmarks %}
-        <div class="bookmarks-grid">
-            {% for bookmark in bookmarks %}
-            <div class="bookmark-card glass" onclick="openFullEditor('{{ bookmark._id }}')">
-                <div class="bookmark-tag">{{ bookmark.type }}</div>
-                <h3 class="bookmark-title" id="title-{{ bookmark._id }}">{{ bookmark.title }}</h3>
-                <div class="bookmark-content" id="content-{{ bookmark._id }}">
-                    {{ bookmark.content }}
-                </div>
-                <!-- Hidden fields for the editor -->
-                <div id="notes-{{ bookmark._id }}" style="display:none">{{ bookmark.personal_notes or "" }}</div>
-                <div id="type-{{ bookmark._id }}" style="display:none">{{ bookmark.type }}</div>
-                <div id="date-{{ bookmark._id }}" style="display:none">{{ bookmark.created_at[:10] }}</div>
-                <div id="updated-{{ bookmark._id }}" style="display:none">{{ bookmark.updated_at[:16].replace('T', ' ') if bookmark.updated_at else "" }}</div>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-                    <span style="font-size: 12px; color: #64748b;">{{ bookmark.created_at[:10] }}</span>
-                    
-                    <div style="display: flex; gap: 10px;" onclick="event.stopPropagation()">
-                        <button class="btn-bookmark active" onclick="copyToClipboard(document.getElementById('content-{{ bookmark._id }}').textContent.trim())" title="Copy Content">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                        </button>
-                        
-                        <form action="{{ url_for('delete_bookmark', bookmark_id=bookmark._id) }}" method="POST" onsubmit="return confirm('Delete this bookmark?');" style="margin: 0;">
-                            <button type="submit" class="btn-delete" title="Delete Bookmark" style="padding: 8px;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="no-notes-message glass" style="padding: 60px 20px; border-radius: 24px; margin-top: 30px; text-align: center; border: 1px dashed rgba(56, 189, 248, 0.2);">
-            <div style="font-size: 50px; margin-bottom: 20px;">📂</div>
-            <p style="color: #cbd5e1; font-size: 18px; font-weight: 500;">No bookmarks yet!</p>
-            <p style="color: #64748b; font-size: 14px; margin-top: 8px; max-width: 300px; margin-left: auto; margin-right: auto;">
-                Save AI answers, study plans, or notes to keep them handy here.
-            </p>
-            <a href="{{ url_for('chat') }}" class="btn-outline" style="display: inline-block; margin-top: 25px; font-size: 14px;">Go to Chat 💬</a>
-        </div>
-        {% endif %}
+<div class="bookmarks-container">
+    <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 40px;">
+        <h2 style="font-weight: 800; font-size: 36px; color: #f8fafc; margin: 0;">Documents</h2>
+        <span style="background: rgba(56, 189, 248, 0.1); color: var(--primary); padding: 5px 12px; border-radius: 10px; font-size: 14px; font-weight: 600;">
+            {{ bookmarks|length }}
+        </span>
     </div>
+    
+    {% if bookmarks %}
+    <div class="bookmarks-grid">
+        {% for bookmark in bookmarks %}
+        <div class="bookmark-card" onclick="openFullEditor('{{ bookmark._id }}')">
+            {% if bookmark.pinned %}
+            <div class="pin-indicator">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M21 10h-2V5c0-1.1-.9-2-2-2H7c-1.1 0-2 .9-2 2v5H3v2h1.49l1.51 6.04V21h12v-2.96L19.51 12H21v-2z"></path></svg>
+            </div>
+            {% endif %}
+            
+            <h3 class="bookmark-title" id="title-{{ bookmark._id }}">{{ bookmark.title }}</h3>
+            <div class="bookmark-preview" id="preview-{{ bookmark._id }}">
+                {{ bookmark.content }}
+            </div>
+            
+            <!-- Hidden full content for editor -->
+            <div id="content-{{ bookmark._id }}" style="display:none">{{ bookmark.content }}</div>
+            <div id="notes-{{ bookmark._id }}" style="display:none">{{ bookmark.personal_notes or "" }}</div>
+            <div id="type-{{ bookmark._id }}" style="display:none">{{ bookmark.type }}</div>
+            <div id="date-{{ bookmark._id }}" style="display:none">{{ bookmark.created_at[:10] }}</div>
+            <div id="updated-{{ bookmark._id }}" style="display:none">{{ bookmark.updated_at[:16].replace('T', ' ') if bookmark.updated_at else "" }}</div>
+            <div id="pinned-{{ bookmark._id }}" style="display:none">{{ 'true' if bookmark.pinned else 'false' }}</div>
+
+            <div class="bookmark-meta">
+                <span>{{ bookmark.created_at[:10] }}</span>
+                <span style="font-weight: 600; color: #475569; font-size: 10px; text-transform: uppercase;">{{ bookmark.type }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="glass" style="padding: 100px 40px; border-radius: 30px; text-align: center; border: 1px dashed rgba(255,255,255,0.05);">
+        <div style="font-size: 64px; margin-bottom: 20px; opacity: 0.5;">📓</div>
+        <h3 style="color: white; margin-bottom: 10px;">Your notebook is empty</h3>
+        <p style="color: #64748b; max-width: 400px; margin: 0 auto 30px;">Save study material or AI answers from your workspace to see them here.</p>
+        <a href="{{ url_for('chat') }}" class="new-chat-btn" style="display: inline-block;">Go to Workspace 🚀</a>
+    </div>
+    {% endif %}
 </div>
 
-<!-- ================= FULL-SCREEN EDITOR MODAL ================= -->
+<!-- ================= APPLE NOTES FULL-SCREEN EDITOR ================= -->
 <div class="modal-overlay" id="fullEditorModal">
-    <!-- Header Fixed -->
-    <div class="modal-header-fixed">
-        <button class="btn-editor-action" onclick="closeFullEditor()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            Back
-        </button>
-        
-        <div class="modal-header-actions">
-            <button class="btn-editor-action" onclick="summarizeContent()" id="summarizeBtn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                AI Summarize
+    <div class="modal-content">
+        <div class="modal-header" style="justify-content: space-between; margin-bottom: 30px; border-bottom: none;">
+            <button class="btn-editor-action" onclick="closeFullEditor()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Done
             </button>
             
-            <form id="deleteForm" method="POST" style="margin: 0;">
-                <button type="submit" class="btn-editor-action" onclick="return confirm('Permanently delete this bookmark?');">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button class="btn-editor-action" id="pinBtn" onclick="togglePinInEditor()" style="padding: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10h-2V5c0-1.1-.9-2-2-2H7c-1.1 0-2 .9-2 2v5H3v2h1.49l1.51 6.04V21h12v-2.96L19.51 12H21v-2z"></path></svg>
                 </button>
-            </form>
-
-            <button class="btn-editor-action btn-editor-save" onclick="saveEditorChanges()">
-                Save Changes
-            </button>
+                <button class="btn-editor-action" onclick="summarizeContent()" id="summarizeBtn" style="color: #a855f7;">
+                    ✨ AI Summary
+                </button>
+                <button class="btn-editor-action" onclick="saveEditorChanges()" style="background: var(--primary); color: #020617; border: none; font-weight: 700;">
+                    Save
+                </button>
+                <form id="deleteForm" method="POST" style="margin: 0;">
+                    <button type="submit" class="btn-editor-action" style="color: #f43f5e; border-color: rgba(244, 63, 94, 0.2);" onclick="return confirm('Delete this document?');">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <!-- Document Content -->
-    <div class="modal-content">
-        <input type="hidden" id="editorBookmarkId">
-        
         <div class="editor-meta-info">
-            <span class="editor-tag" id="editorTypeTag">TYPE</span>
-            <span class="editor-date" id="editorFullDate">Created: 2024-04-05</span>
-            <span class="editor-date" id="editorUpdateDate" style="margin-left: auto;"></span>
+            <span id="editorTypeTag" style="color: #475569; font-weight: 700;">STUDY PLAN</span>
+            <span id="editorFullDate">Created Oct 5, 2026</span>
+            <span id="editorUpdateDate" style="color: var(--primary);"></span>
         </div>
 
-        <input type="text" id="editorTitle" class="editor-title-input" placeholder="Untitled Bookmark">
+        <input type="text" id="editorTitle" class="editor-title-input" placeholder="Document Title...">
+        <textarea id="editorContent" class="editor-main-content" placeholder="Start typing..."></textarea>
         
-        <div id="summaryBadge" class="ai-summary-badge">
-            <strong>✨ AI Summary:</strong><br>
-            <span id="summaryText"></span>
+        <div style="margin-top: 50px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.03);">
+            <h4 style="color: #475569; margin-bottom: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Personal Notes</h4>
+            <textarea id="editorNotes" class="editor-notes-textarea" 
+                style="width: 100%; background: transparent; border: none; color: #94a3b8; font-size: 16px; line-height: 1.6; outline: none; resize: none; min-height: 100px;"
+                placeholder="Add your own insights here..."></textarea>
         </div>
-
-        <textarea id="editorContent" class="editor-main-content" placeholder="Start writing something amazing..."></textarea>
         
-        <div class="editor-section-divider"></div>
-
-        <div class="editor-notes-section">
-            <h3>Personal Study Notes</h3>
-            <textarea id="editorNotes" class="editor-notes-textarea" placeholder="Add your own thoughts, reminders, or additional research here..."></textarea>
-        </div>
+        <input type="hidden" id="editorBookmarkId">
+        <input type="hidden" id="editorIsPinned">
     </div>
 </div>
 
 <script>
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            showToast('Copied to clipboard!');
-        }).catch(err => {
-            console.error('Failed to copy:', err);
-        });
-    }
-
     function openFullEditor(id) {
         const title = document.getElementById(`title-${id}`).textContent.trim();
         const content = document.getElementById(`content-${id}`).textContent.trim();
@@ -127,28 +105,48 @@
         const type = document.getElementById(`type-${id}`).textContent.trim();
         const date = document.getElementById(`date-${id}`).textContent.trim();
         const updated = document.getElementById(`updated-${id}`).textContent.trim();
+        const isPinned = document.getElementById(`pinned-${id}`).textContent.trim() === 'true';
         
         document.getElementById('editorBookmarkId').value = id;
         document.getElementById('editorTitle').value = title;
         document.getElementById('editorContent').value = content;
         document.getElementById('editorNotes').value = notes;
         document.getElementById('editorTypeTag').textContent = type;
-        document.getElementById('editorFullDate').textContent = `Created: ${date}`;
-        document.getElementById('editorUpdateDate').textContent = updated ? `Last edited: ${updated}` : "";
+        document.getElementById('editorFullDate').textContent = date;
+        document.getElementById('editorUpdateDate').textContent = updated ? `Edited ${updated}` : "";
+        document.getElementById('editorIsPinned').value = isPinned;
         
-        // Update delete form action
         document.getElementById('deleteForm').action = `/bookmarks/delete/${id}`;
-        
-        // Hide summary badge initially
-        document.getElementById('summaryBadge').style.display = 'none';
+        updatePinUI(isPinned);
 
-        document.getElementById('fullEditorModal').style.display = 'flex';
+        const modal = document.getElementById('fullEditorModal');
+        modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
 
     function closeFullEditor() {
-        document.getElementById('fullEditorModal').style.display = 'none';
+        document.getElementById('fullEditorModal').classList.remove('active');
         document.body.style.overflow = 'auto';
+    }
+
+    function updatePinUI(pinned) {
+        const pinBtn = document.getElementById('pinBtn');
+        if (pinned) {
+            pinBtn.style.color = 'var(--primary)';
+            pinBtn.style.borderColor = 'var(--primary)';
+            pinBtn.style.background = 'rgba(56, 189, 248, 0.1)';
+        } else {
+            pinBtn.style.color = '';
+            pinBtn.style.borderColor = '';
+            pinBtn.style.background = '';
+        }
+    }
+
+    function togglePinInEditor() {
+        const val = document.getElementById('editorIsPinned').value === 'true';
+        document.getElementById('editorIsPinned').value = !val;
+        updatePinUI(!val);
+        showToast(!val ? 'Document Pinned' : 'Document Unpinned');
     }
 
     async function saveEditorChanges() {
@@ -156,72 +154,43 @@
         const title = document.getElementById('editorTitle').value.trim();
         const content = document.getElementById('editorContent').value.trim();
         const personal_notes = document.getElementById('editorNotes').value.trim();
-        
-        if (!content) {
-            alert('Content cannot be empty');
-            return;
-        }
-
-        const btn = document.querySelector('.btn-editor-save');
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = 'Saving...';
+        const pinned = document.getElementById('editorIsPinned').value === 'true';
 
         try {
             const response = await fetch(`/bookmarks/update/${id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, content, personal_notes })
+                body: JSON.stringify({ title, content, personal_notes, pinned })
             });
             const data = await response.json();
             
             if (data.status === 'success') {
-                // Update grid UI locally
-                document.getElementById(`title-${id}`).textContent = title;
-                document.getElementById(`content-${id}`).textContent = content;
-                document.getElementById(`notes-${id}`).textContent = personal_notes;
-                
-                showToast('✨ Changes saved successfully!');
-            } else {
-                alert('Error: ' + data.error);
+                showToast('Documents saved ✨');
+                setTimeout(() => location.reload(), 1500); // Reload to update sort order
             }
         } catch (err) {
-            alert('Failed to save changes.');
-        } finally {
-            btn.disabled = false;
-            btn.textContent = originalText;
+            showToast('Sync failed');
         }
     }
 
     async function summarizeContent() {
         const id = document.getElementById('editorBookmarkId').value;
         const btn = document.getElementById('summarizeBtn');
-        const originalHTML = btn.innerHTML;
-        
+        const text = btn.textContent;
+        btn.textContent = '✨ Processing...';
         btn.disabled = true;
-        btn.innerHTML = '✨ Summarizing...';
 
         try {
             const response = await fetch(`/api/bookmarks/summarize/${id}`, { method: 'POST' });
             const data = await response.json();
-            
             if (data.summary) {
-                const badge = document.getElementById('summaryBadge');
-                const text = document.getElementById('summaryText');
-                text.textContent = data.summary;
-                badge.style.display = 'block';
-                
-                // Also append to main content for convenience
                 const contentArea = document.getElementById('editorContent');
-                contentArea.value += `\n\n--- AI SUMMARY ---\n${data.summary}`;
-                
-                showToast('AI Summary generated!');
+                contentArea.value += `\n\n--- AI INSIGHT ---\n${data.summary}`;
+                showToast('Summary generated');
             }
-        } catch (err) {
-            alert('AI summarization failed.');
         } finally {
+            btn.textContent = text;
             btn.disabled = false;
-            btn.innerHTML = originalHTML;
         }
     }
 
