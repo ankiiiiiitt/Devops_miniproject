@@ -21,11 +21,11 @@
             
             <h3 class="bookmark-title" id="title-{{ bookmark._id }}">{{ bookmark.title }}</h3>
             <div class="bookmark-preview" id="preview-{{ bookmark._id }}">
-                {{ bookmark.content }}
+                {{ bookmark.content | safe }}
             </div>
             
             <!-- Hidden full content for editor -->
-            <div id="content-{{ bookmark._id }}" style="display:none">{{ bookmark.content }}</div>
+            <div id="content-{{ bookmark._id }}" style="display:none">{{ bookmark.content | safe }}</div>
             <div id="notes-{{ bookmark._id }}" style="display:none">{{ bookmark.personal_notes or "" }}</div>
             <div id="type-{{ bookmark._id }}" style="display:none">{{ bookmark.type }}</div>
             <div id="date-{{ bookmark._id }}" style="display:none">{{ bookmark.created_at[:10] }}</div>
@@ -83,7 +83,7 @@
         </div>
 
         <input type="text" id="editorTitle" class="editor-title-input" placeholder="Document Title...">
-        <textarea id="editorContent" class="editor-main-content" placeholder="Start typing..."></textarea>
+        <div id="editorContent" class="editor-main-content" contenteditable="true"></div>
         
         <div style="margin-top: 50px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.03);">
             <h4 style="color: #475569; margin-bottom: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Personal Notes</h4>
@@ -109,7 +109,7 @@
         
         document.getElementById('editorBookmarkId').value = id;
         document.getElementById('editorTitle').value = title;
-        document.getElementById('editorContent').value = content;
+        document.getElementById('editorContent').innerHTML = content;
         document.getElementById('editorNotes').value = notes;
         document.getElementById('editorTypeTag').textContent = type;
         document.getElementById('editorFullDate').textContent = date;
@@ -152,7 +152,7 @@
     async function saveEditorChanges() {
         const id = document.getElementById('editorBookmarkId').value;
         const title = document.getElementById('editorTitle').value.trim();
-        const content = document.getElementById('editorContent').value.trim();
+        const content = document.getElementById('editorContent').innerHTML.trim();
         const personal_notes = document.getElementById('editorNotes').value.trim();
         const pinned = document.getElementById('editorIsPinned').value === 'true';
 
@@ -185,7 +185,7 @@
             const data = await response.json();
             if (data.summary) {
                 const contentArea = document.getElementById('editorContent');
-                contentArea.value += `\n\n--- AI INSIGHT ---\n${data.summary}`;
+                contentArea.innerHTML += `<br><br><div style="border-top:1px solid rgba(168, 85, 247, 0.2); padding-top:15px; margin-top:15px;"><strong style="color:#a855f7;">✨ AI INSIGHT:</strong><br>${data.summary}</div>`;
                 showToast('Summary generated');
             }
         } finally {
