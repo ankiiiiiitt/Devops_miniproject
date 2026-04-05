@@ -6,46 +6,36 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 1. HERO TILT (UPGRADED 3D VERSION)
     const heroHeading = document.getElementById('heroHeading');
-    const heroText = document.querySelector('.hero-3d-text');
+    const heroText = document.querySelector('.hero-heading-3d');
 
     if (heroHeading && heroText) {
-
-        let currentX = 0;
-        let currentY = 0;
-        let targetX = 0;
-        let targetY = 0;
+        let currentX = 0, currentY = 0, targetX = 0, targetY = 0;
 
         heroHeading.addEventListener('mousemove', (e) => {
             const rect = heroHeading.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
 
-            targetX = ((y - centerY) / centerY) * -15;
-            targetY = ((x - centerX) / centerX) * 15;
+            targetX = ((y - centerY) / centerY) * -12; // Adjusted intensity
+            targetY = ((x - centerX) / centerX) * 12;
         });
 
         heroHeading.addEventListener('mouseleave', () => {
-            targetX = 0;
-            targetY = 0;
+            targetX = 0; targetY = 0;
         });
 
         function animate3D() {
-            // smooth interpolation (VERY IMPORTANT 🔥)
             currentX += (targetX - currentX) * 0.1;
             currentY += (targetY - currentY) * 0.1;
-
             heroText.style.transform = `
-            rotateX(${currentX}deg)
-            rotateY(${currentY}deg)
-            translateZ(40px)
-        `;
-
+                rotateX(${currentX}deg)
+                rotateY(${currentY}deg)
+                translateZ(20px)
+            `;
             requestAnimationFrame(animate3D);
         }
-
         animate3D();
     }
 
