@@ -25,6 +25,7 @@ users_col = db.users
 cache_col = db.cache
 chats_col = db.chats
 notes_col = db.notes
+bookmarks_col = db.bookmarks
 
 # ================= MAIL SETUP =================
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
@@ -97,6 +98,51 @@ def delete_note(note_id):
     except:
         pass
     return redirect(url_for("notes"))
+
+# ================= BOOKMARKS =================
+@app.route("/bookmark", methods=["POST"])
+def add_bookmark():
+    if "user" not in session:
+        return {"error": "Unauthorized"}, 401
+
+    data = request.json
+    title = data.get("title")
+    content = data.get("content")
+    item_type = data.get("type", "AI Answer")
+
+    if not content:
+        return {"error": "Content is required"}, 400
+
+    bookmark_doc = {
+        "user_email": session.get("user_email"),
+        "title": title or (content[:50] + "..." if len(content) > 50 else content),
+        "content": content,
+        "type": item_type,
+        "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+    }
+    
+    bookmarks_col.insert_one(bookmark_doc)
+    return {"status": "success", "message": "Bookmarked successfully!"}
+
+@app.route("/bookmarks")
+def bookmarks():
+    if "user" not in session:
+        return redirect(url_for("login"))
+    
+    user_bookmarks = list(bookmarks_col.find({"user_email": session.get("user_email")}).sort("created_at", -1))
+    return render_template("bookmarks.html", bookmarks=user_bookmarks)
+
+@app.route("/bookmarks/delete/<bookmark_id>", methods=["POST"])
+def delete_bookmark(bookmark_id):
+    if "user" not in session:
+        return redirect(url_for("login"))
+        
+    from bson.objectid import ObjectId
+    try:
+        bookmarks_col.delete_one({"_id": ObjectId(bookmark_id), "user_email": session.get("user_email")})
+    except:
+        pass
+    return redirect(url_for("bookmarks"))
 
 # ================= CHAT =================
 @app.route("/chat")

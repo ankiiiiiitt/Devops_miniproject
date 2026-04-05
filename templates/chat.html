@@ -8,12 +8,30 @@
                 {% if msg.role != 'system' %}
                 <div class="chat-message {{ 'user' if msg.role == 'user' else 'ai' }}">
                     {{ msg.content }}
+                    {% if msg.role == 'assistant' %}
+                    <div class="chat-message-actions">
+                        <button class="btn-bookmark" 
+                            data-content="{{ msg.content }}" 
+                            data-type="AI Chat Response"
+                            onclick="handleBookmarkClick(this)" title="Bookmark this response">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                        </button>
+                    </div>
+                    {% endif %}
                 </div>
                 {% endif %}
             {% endfor %}
         {% else %}
         <div class="chat-message ai">
             Hello {{ session.get('user', 'there') }}! I'm your AI study assistant. How can I help you focus and learn today?
+            <div class="chat-message-actions">
+                <button class="btn-bookmark" 
+                    data-content="Hello {{ session.get('user', 'there') }}! I'm your AI study assistant. How can I help you focus and learn today?" 
+                    data-type="AI Chat Response"
+                    onclick="handleBookmarkClick(this)" title="Bookmark this response">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                </button>
+            </div>
         </div>
         {% endif %}
     </div>
@@ -109,6 +127,23 @@
         div.className = `chat-message ${sender}`;
         if (id) div.id = id;
         div.textContent = text;
+
+        if (sender === 'ai' && !id) {
+            const actions = document.createElement('div');
+            actions.className = 'chat-message-actions';
+            
+            const bMark = document.createElement('button');
+            bMark.className = 'btn-bookmark';
+            bMark.title = 'Bookmark this response';
+            bMark.setAttribute('data-content', text);
+            bMark.setAttribute('data-type', 'AI Chat Response');
+            bMark.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>`;
+            bMark.onclick = () => handleBookmarkClick(bMark);
+            
+            actions.appendChild(bMark);
+            div.appendChild(actions);
+        }
+        
         chatHistory.appendChild(div);
         
         // Scroll to bottom

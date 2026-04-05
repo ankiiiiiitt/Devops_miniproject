@@ -1,0 +1,63 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+<div class="tool-container-flex">
+    <div class="bookmarks-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
+            <h2 style="font-weight: 500; font-size: 32px; color: #38bdf8; margin: 0;">My Saved Bookmarks 🔖</h2>
+        </div>
+        
+        {% if bookmarks %}
+        <div class="bookmarks-grid">
+            {% for bookmark in bookmarks %}
+            <div class="bookmark-card glass">
+                <div class="bookmark-tag">{{ bookmark.type }}</div>
+                <h3 class="bookmark-title">{{ bookmark.title }}</h3>
+                <div class="bookmark-content">
+                    {{ bookmark.content }}
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+                    <span style="font-size: 12px; color: #64748b;">{{ bookmark.created_at[:10] }}</span>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-bookmark active" onclick="copyToClipboard(this.getAttribute('data-content'))" data-content="{{ bookmark.content }}" title="Copy Content">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        
+                        <form action="{{ url_for('delete_bookmark', bookmark_id=bookmark._id) }}" method="POST" onsubmit="return confirm('Delete this bookmark?');" style="margin: 0;">
+                            <button type="submit" class="btn-delete" title="Delete Bookmark" style="padding: 8px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-notes-message glass" style="padding: 60px 20px; border-radius: 24px; margin-top: 30px; text-align: center; border: 1px dashed rgba(56, 189, 248, 0.2);">
+            <div style="font-size: 50px; margin-bottom: 20px;">📂</div>
+            <p style="color: #cbd5e1; font-size: 18px; font-weight: 500;">No bookmarks yet!</p>
+            <p style="color: #64748b; font-size: 14px; margin-top: 8px; max-width: 300px; margin-left: auto; margin-right: auto;">
+                Save AI answers, study plans, or notes to keep them handy here.
+            </p>
+            <a href="{{ url_for('chat') }}" class="btn-outline" style="display: inline-block; margin-top: 25px; font-size: 14px;">Go to Chat 💬</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+        });
+    }
+</script>
+{% endblock %}
