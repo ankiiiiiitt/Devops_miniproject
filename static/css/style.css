@@ -1137,91 +1137,6 @@ a {
   }
 }
 
-/* =============================================================
-   CINEMATIC 3D HERO SYSTEM
-   ============================================================= */
-.hero {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0 8%;
-  perspective: 2000px;
-  transform-style: preserve-3d;
-}
-
-.hero-text {
-  max-width: 800px;
-  transform-style: preserve-3d;
-}
-
-.hero-badge {
-  background: rgba(56, 189, 248, 0.1);
-  color: var(--primary);
-  padding: 8px 16px;
-  border-radius: 100px;
-  font-size: 13px;
-  font-weight: 600;
-  width: fit-content;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  margin-bottom: 25px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
-  animation: pulseBadge 3s infinite;
-}
-
-@keyframes pulseBadge {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(0.98); }
-}
-
-.hero-heading-3d {
-  font-size: 96px;
-  font-weight: 900;
-  line-height: 1.05;
-  margin-bottom: 35px;
-  color: #fff;
-  transform-style: preserve-3d;
-}
-
-.hero-heading-3d .line {
-  display: block;
-}
-
-.hero-heading-3d .accent {
-  background: linear-gradient(135deg, #fff, var(--primary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline-block;
-  transform: translateZ(80px);
-  text-shadow: 
-    0px 0px 1px rgba(255,255,255,0.4),
-    1px 0px 0px #1e293b,
-    0px 1px 0px #1e293b,
-    2px 2px 0px #0ea5e9,
-    3px 3px 0px #0284c7;
-}
-
-.hero-heading-3d .dim {
-  color: #94a3b8;
-  display: inline-block;
-  transform: translateZ(40px);
-}
-
-.hero-subtext {
-  font-size: 20px;
-  line-height: 1.6;
-  color: #cbd5e1;
-  max-width: 600px;
-  margin-bottom: 45px;
-  background: rgba(15, 23, 42, 0.3);
-  backdrop-filter: blur(10px);
-  padding: 15px 25px;
-  border-radius: 20px;
-  border-left: 4px solid var(--primary);
-}
-
 /* Fix Line-Clamp compatibility issue in previous section */
 .bookmark-preview {
   display: -webkit-box;
@@ -1231,144 +1146,115 @@ a {
   overflow: hidden;
 }
 
-/* ================= HERO 3D TEXT ================= */
-.hero-heading-wrapper {
-  perspective: 1200px;
-  margin-bottom: 25px;
-  display: inline-block;
-}
-
-.hero-3d-text {
-  font-size: 56px;
-  line-height: 1.1;
-  font-weight: 700;
+/* =============================================================
+   CINEMATIC 3D HERO SYSTEM (LANDING PAGE)
+   ============================================================= */
+.hero {
+  min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  transition: transform 0.2s ease-out;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 8%;
+  perspective: 2000px;
   transform-style: preserve-3d;
+  position: relative;
+  overflow: hidden;
 }
 
-.hero-3d-text .word {
-  display: inline-block;
-  opacity: 0;
-  filter: blur(10px);
-  animation: heroEntrance 1.2s forwards;
+.hero-text {
+  max-width: 900px;
+  transform-style: preserve-3d;
+  z-index: 10;
 }
 
-@keyframes heroEntrance {
-  to {
-    opacity: 1;
-    filter: blur(0);
-    transform: translateY(0);
-  }
+.hero-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--primary);
+  padding: 10px 20px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  width: fit-content;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+  animation: pulseBadge 3s infinite;
 }
 
-.line.gradient .word {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+@keyframes pulseBadge {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(0.96); }
+}
+
+.hero-heading-3d {
+  font-size: 96px;
+  font-weight: 900;
+  line-height: 0.95;
+  margin-bottom: 40px;
+  color: #ffffff;
+  transform-style: preserve-3d;
+  letter-spacing: -2px;
+}
+
+.hero-heading-3d .line {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.hero-heading-3d .accent {
+  background: linear-gradient(135deg, #ffffff, var(--primary));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  display: inline-block;
+  transform: translateZ(100px);
+  text-shadow: 
+    0px 0px 2px rgba(255,255,255,0.4),
+    3px 3px 0px #0ea5e9,
+    6px 6px 0px #0284c7,
+    0 20px 40px rgba(0,0,0,0.5);
+  filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.4));
 }
 
-/* Utilities */
-.toast-container {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  z-index: 10000;
+.hero-heading-3d .dim {
+  color: #94a3b8;
+  display: inline-block;
+  transform: translateZ(50px);
 }
 
-.toast {
-  background: rgba(15, 23, 42, 0.95);
-  border: 1px solid var(--primary);
-  padding: 12px 24px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: slideIn 0.3s ease-out;
+.hero-subtext {
+  font-size: 22px;
+  line-height: 1.6;
+  color: #cbd5e1;
+  max-width: 650px;
+  margin-bottom: 50px;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(25px);
+  padding: 20px 35px;
+  border-radius: 24px;
+  border-left: 5px solid var(--primary);
+  border: 1px solid var(--border-glass);
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
+/* ================= RESPONSIVE HERO ================= */
+@media (max-width: 1000px) {
+  .hero {
+    padding: 120px 5% 60px;
+    justify-content: center;
+    text-align: center;
   }
-
-  to {
-    transform: translateX(0);
-  }
-}
-
-.ai-typing-indicator {
-  display: flex;
-  gap: 6px;
-  padding: 10px;
-}
-
-.ai-typing-indicator span {
-  width: 8px;
-  height: 8px;
-  background: var(--primary);
-  border-radius: 50%;
-  animation: pulse 1.4s infinite ease-in-out;
-}
-
-@keyframes pulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.4;
-  }
-
-  50% {
-    transform: scale(1.3);
-    opacity: 1;
+  
+  .hero-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 }
 
-
-
-/* ===== REAL 3D DEPTH ===== */
-.hero-3d-text {
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-
-/* EACH WORD DEPTH */
-.hero-3d-text .word {
-  transform: translateZ(40px);
-  text-shadow:
-    0 5px 15px rgba(0, 0, 0, 0.5),
-    0 0 25px rgba(56, 189, 248, 0.3);
-}
-
-/* LIGHT GLOW SWEEP */
-.hero-3d-text::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(120deg,
-      transparent,
-      rgba(255, 255, 255, 0.1),
-      transparent);
-  opacity: 0;
-  animation: lightSweep 3s infinite;
-}
-
-@keyframes lightSweep {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-}
+/* Utilities & Animations */
+.toast-container { position: fixed; bottom: 30px; right: 30px; z-index: 10000; }
+.ai-typing-indicator { display: flex; gap: 6px; padding: 10px; }
+.ai-typing-indicator span { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; animation: pulse 1.4s infinite ease-in-out; }
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.3); opacity: 1; } }
