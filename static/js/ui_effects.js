@@ -128,34 +128,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 7. SIDEBAR 3D TILT (Floating Blade)
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar) {
-        let sX = 0, sY = 0, stX = 0, stY = 0;
-
-        document.addEventListener('mousemove', (e) => {
-            const x = e.clientX;
-            const y = e.clientY;
-            
-            // Check if mouse is on the left side of the screen
-            if (x < 400) {
-                const centerX = 150; // Sidebar center approx
-                const centerY = window.innerHeight / 2;
-
-                stX = ((y - centerY) / centerY) * -5; 
-                stY = ((x - centerX) / centerX) * 5;
-            } else {
-                stX = 0; stY = 0; // Reset when mouse leaves sidebar area
-            }
+    // 6. PARTICLES INITIALIZATION
+    if (typeof particlesJS !== 'undefined' && document.getElementById('particles-js')) {
+        particlesJS('particles-js', {
+            "particles": {
+                "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#38bdf8" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.2, "random": false },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#38bdf8", "opacity": 0.1, "width": 1 },
+                "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } }, "push": { "particles_nb": 4 } }
+            },
+            "retina_detect": true
         });
-
-        function animateSidebar3D() {
-            sX += (stX - sX) * 0.05;
-            sY += (stY - sY) * 0.05;
-            sidebar.style.transform = `rotateX(${sX}deg) rotateY(${sY}deg)`;
-            requestAnimationFrame(animateSidebar3D);
-        }
-        animateSidebar3D();
     }
 });
 
