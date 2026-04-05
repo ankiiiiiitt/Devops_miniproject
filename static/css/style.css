@@ -1272,8 +1272,9 @@ a {
   50% { opacity: 0.8; transform: scale(0.96); }
 }
 
-.hero-heading-3d {
-  font-size: 96px;
+/* Hero Heading - Scoped specifically to Landing Page */
+.landing-page .hero-heading-3d {
+  font-size: clamp(48px, 8vw, 96px);
   font-weight: 900;
   line-height: 0.95;
   margin-bottom: 40px;
@@ -1335,6 +1336,55 @@ a {
     flex-direction: column;
     align-items: center;
   }
+}
+
+/* =============================================================
+   EDITOR RICH TYPOGRAPHY (Rendered HTML)
+   ============================================================= */
+.editor-main-content {
+  min-height: 400px;
+  padding: 20px 0;
+  font-size: 17px;
+  line-height: 1.8;
+  color: #f1f5f9;
+  outline: none;
+  overflow-y: auto;
+}
+
+.editor-main-content h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 35px 0 15px 0;
+  line-height: 1.3;
+}
+
+.editor-main-content h3 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #f8fafc;
+  margin: 25px 0 10px 0;
+}
+
+.editor-main-content p {
+  margin-bottom: 20px;
+  color: #cbd5e1;
+}
+
+.editor-main-content ul, .editor-main-content ol {
+  margin: 0 0 25px 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.editor-main-content li {
+  color: #cbd5e1;
+}
+
+.editor-main-content strong {
+  color: white;
+  font-weight: 700;
 }
 
 /* Utilities & Animations */

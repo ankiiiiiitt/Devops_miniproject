@@ -97,27 +97,38 @@
     </div>
 </div>
 
+<!-- Data Store -->
+<script>
+    const bookmarksData = {};
+    {% for bookmark in bookmarks %}
+    bookmarksData["{{ bookmark._id }}"] = {
+        title: {{ bookmark.title | tojson | safe }},
+        content: {{ bookmark.content | tojson | safe }},
+        notes: {{ (bookmark.personal_notes or "") | tojson | safe }},
+        type: {{ bookmark.type | tojson | safe }},
+        date: "{{ bookmark.created_at[:10] }}",
+        updated: "{{ bookmark.updated_at[:16].replace('T', ' ') if bookmark.updated_at else '' }}",
+        pinned: {{ 'true' if bookmark.pinned else 'false' }}
+    };
+    {% endfor %}
+</script>
+
 <script>
     function openFullEditor(id) {
-        const title = document.getElementById(`title-${id}`).textContent.trim();
-        const content = document.getElementById(`content-${id}`).textContent.trim();
-        const notes = document.getElementById(`notes-${id}`).textContent.trim();
-        const type = document.getElementById(`type-${id}`).textContent.trim();
-        const date = document.getElementById(`date-${id}`).textContent.trim();
-        const updated = document.getElementById(`updated-${id}`).textContent.trim();
-        const isPinned = document.getElementById(`pinned-${id}`).textContent.trim() === 'true';
+        const data = bookmarksData[id];
+        if (!data) return;
         
         document.getElementById('editorBookmarkId').value = id;
-        document.getElementById('editorTitle').value = title;
-        document.getElementById('editorContent').innerHTML = content;
-        document.getElementById('editorNotes').value = notes;
-        document.getElementById('editorTypeTag').textContent = type;
-        document.getElementById('editorFullDate').textContent = date;
-        document.getElementById('editorUpdateDate').textContent = updated ? `Edited ${updated}` : "";
-        document.getElementById('editorIsPinned').value = isPinned;
+        document.getElementById('editorTitle').value = data.title;
+        document.getElementById('editorContent').innerHTML = data.content;
+        document.getElementById('editorNotes').value = data.notes;
+        document.getElementById('editorTypeTag').textContent = data.type;
+        document.getElementById('editorFullDate').textContent = `Created ${data.date}`;
+        document.getElementById('editorUpdateDate').textContent = data.updated ? `Edited ${data.updated}` : "";
+        document.getElementById('editorIsPinned').value = data.pinned;
         
         document.getElementById('deleteForm').action = `/bookmarks/delete/${id}`;
-        updatePinUI(isPinned);
+        updatePinUI(data.pinned);
 
         const modal = document.getElementById('fullEditorModal');
         modal.classList.add('active');

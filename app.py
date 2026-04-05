@@ -654,15 +654,27 @@ STRICT INSTRUCTIONS:
         
         if match:
             content = match.group(1).strip()
-            # Remove any unwanted HTML if it slipped in
             content = re.sub(r'<[^>]*>', '', content)
             milestones = [t.strip() for t in content.split(",") if t.strip()]
             display_plan = ai_response.replace(match.group(0), "").strip()
         else:
-            # Fallback: try to extract bullet points as milestones if delimiter failed
             fallback_matches = re.findall(r"^\s*[\-\*]\s*(.*)$", ai_response, re.MULTILINE)
             milestones = [m.strip() for m in fallback_matches if len(m.strip()) < 50][:10]
             display_plan = ai_response
+
+        # --- Simple Markdown to HTML Converter ---
+        # 1. Convert headers
+        display_plan = re.sub(r'^### (.*)$', r'<h3>\1</h3>', display_plan, flags=re.MULTILINE)
+        display_plan = re.sub(r'^## (.*)$', r'<h2>\1</h2>', display_plan, flags=re.MULTILINE)
+        display_plan = re.sub(r'^# (.*)$', r'<h1>\1</h1>', display_plan, flags=re.MULTILINE)
+        # 2. Convert Bold
+        display_plan = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', display_plan)
+        # 3. Convert Lists
+        display_plan = re.sub(r'^\s*[\-\*]\s*(.*)$', r'<li>\1</li>', display_plan, flags=re.MULTILINE)
+        # 4. Wrap lists in <ul> (simple approach)
+        display_plan = display_plan.replace('<li>', '<ul><li>', 1).replace('</li>\n', '</li></ul>\n')
+        # 5. Convert Newlines to <br> for standard text
+        display_plan = display_plan.replace("\n", "<br>")
 
         # Use the first 3 words for the subject
         hint = (syllabus or topics or "Study Plan").strip()

@@ -93,7 +93,7 @@
                 <button class="tag" id="tagImportant" onclick="toggleTag('important')">🔥 Important</button>
                 <button class="tag" id="tagPinned" onclick="toggleTag('pinned')">📌 Pinned</button>
             </div>
-            <textarea id="modalContent" class="modal-content-textarea" placeholder="Start your deep work here..."></textarea>
+            <div id="modalContent" class="modal-content-textarea" contenteditable="true"></div>
         </div>
 
         <div class="modal-footer">
@@ -118,7 +118,7 @@
         currentTags = JSON.parse(card.getAttribute('data-tags') || '[]');
         
         document.getElementById('modalTitle').value = card.getAttribute('data-title');
-        document.getElementById('modalContent').value = card.getAttribute('data-content');
+        document.getElementById('modalContent').innerHTML = card.getAttribute('data-content');
         document.getElementById('deleteNoteForm').action = `/notes/delete/${id}`;
         
         updateTagUI();
