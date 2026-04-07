@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_ID = 'your_dockerhub_username'
+        DOCKER_HUB_ID = 'ankiiiiitt'
         IMAGE_NAME = 'focusvault-app'
         EC2_IP = 'your_ec2_public_ip'
         PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
