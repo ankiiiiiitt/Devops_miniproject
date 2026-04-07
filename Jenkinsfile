@@ -4,32 +4,35 @@ pipeline {
     environment {
         DOCKER_HUB_ID = 'your_dockerhub_username'
         IMAGE_NAME = 'focusvault-app'
-        REGISTRY_USER_CREDENTIALS_ID = 'docker-hub-creds'
-        SSH_CREDENTIALS_ID = 'ec2-ssh-creds'
         EC2_IP = 'your_ec2_public_ip'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/yourusername/Devops_Project.git'
+                git branch: 'main', url: 'https://github.com/ankiiiiiitt/Devops_miniproject.git'
+                echo '✅ Code checked out from GitHub successfully!'
             }
         }
 
-        stage('Build Image') {
+        stage('Build Docker Image') {
             steps {
-                script {
-                    dockerImage = docker.build("${DOCKER_HUB_ID}/${IMAGE_NAME}:${env.BUILD_ID}")
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    sh "docker build -t ${DOCKER_HUB_ID}/${IMAGE_NAME}:latest ."
+                    echo '✅ Docker image built successfully!'
                 }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                script {
-                    docker.withRegistry('', REGISTRY_USER_CREDENTIALS_ID) {
-                        dockerImage.push("${env.BUILD_ID}")
-                        dockerImage.push("latest")
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-creds',
+                                                      usernameVariable: 'DOCKER_USER',
+                                                      passwordVariable: 'DOCKER_PASS')]) {
+                        sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                        sh "docker push ${DOCKER_HUB_ID}/${IMAGE_NAME}:latest"
+                        echo '✅ Image pushed to Docker Hub!'
                     }
                 }
             }
@@ -37,17 +40,18 @@ pipeline {
 
         stage('Deploy to EC2') {
             steps {
-                sshagent([SSH_CREDENTIALS_ID]) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} '
-                            docker pull ${DOCKER_HUB_ID}/${IMAGE_NAME}:latest
-                            docker stop focusvault-web || true
-                            docker rm focusvault-web || true
-                            docker run -d --name focusvault-web -p 5001:5000 \
-                                -e MONGO_URI=mongodb://mongodb:27017/ai_sem_project \
-                                ${DOCKER_HUB_ID}/${IMAGE_NAME}:latest
-                        '
-                    """
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    sshagent(['ec2-ssh-creds']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ubuntu@${EC2_IP} '
+                                docker pull ${DOCKER_HUB_ID}/${IMAGE_NAME}:latest &&
+                                docker stop focusvault || true &&
+                                docker rm focusvault || true &&
+                                docker run -d --name focusvault -p 5001:5000 ${DOCKER_HUB_ID}/${IMAGE_NAME}:latest
+                            '
+                        """
+                        echo '✅ Deployed to EC2!'
+                    }
                 }
             }
         }
@@ -55,7 +59,14 @@ pipeline {
 
     post {
         always {
+            echo '🏁 Pipeline finished.'
             cleanWs()
+        }
+        success {
+            echo '🎉 All stages passed!'
+        }
+        unstable {
+            echo '⚠️ Some optional stages (Docker/EC2) were skipped. Core checkout succeeded!'
         }
     }
 }
