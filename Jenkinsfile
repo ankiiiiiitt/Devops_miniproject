@@ -31,7 +31,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-creds',
                                                       usernameVariable: 'DOCKER_USER',
                                                       passwordVariable: 'DOCKER_PASS')]) {
-                        sh '/usr/local/bin/docker login -u $DOCKER_USER -p $DOCKER_PASS'
+                        sh 'printf "%s" "$DOCKER_PASS" | /usr/local/bin/docker login -u $DOCKER_USER --password-stdin'
                         sh '/usr/local/bin/docker push ${DOCKER_HUB_ID}/${IMAGE_NAME}:latest'
                         echo '✅ Pushed to Docker Hub!'
                     }
