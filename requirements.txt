@@ -33,7 +33,6 @@ annotated-types==0.7.0
 typing-extensions==4.15.0
 pydantic-core==2.41.5
 jiter==0.13.0
-dnspython==2.8.0
 SQLAlchemy==2.0.46
 greenlet==3.1.1
 six==1.17.0
